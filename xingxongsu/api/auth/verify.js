@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   // Publishers list with their respective sub_ids mapped to Affise
   const publishers = [
     { email: "test@gmail.com", phone: "TEST123", password: "password123", sub_id: "TEST123" }
+    { email: "aarushi@mobpine.com", phone: "9876543210", password: "mobpine@123", sub_id: "224" }
     // Yahan apne baaki real publishers bhi add kar sakta hai jinka real sub_id Affise mein hai
   ];
 
