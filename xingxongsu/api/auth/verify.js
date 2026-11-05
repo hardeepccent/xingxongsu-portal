@@ -34,16 +34,23 @@ export default async function handler(req, res) {
     });
   }
 
-  const AFFISE_API_URL = 'https://digimcorps.g2afse.com/v1/stats';
+  const AFFISE_API_URL = 'https://digimcorps.g2afse.com/3.0/stats/custom';
   const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
   try {
     const today = new Date().toISOString().split('T')[0];
+    const dFrom = date_from || today;
+    const dTo = date_to || today;
+
+    // Affise v3.0 expects filters nested under filter[...] and slice parameters
     const params = new URLSearchParams({
       'filter[sub1]': publisher.sub_id,
-      'date_from': date_from || today,
-      'date_to': date_to || today
+      'filter[date_from]': dFrom,
+      'filter[date_to]': dTo
     });
+
+    // Add slices if required by custom stats endpoint
+    params.append('slice[]', 'offer');
 
     const fields = ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout'];
     fields.forEach(field => params.append('fields[]', field));
