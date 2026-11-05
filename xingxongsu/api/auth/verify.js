@@ -21,8 +21,23 @@ export default async function handler(req, res) {
     return res.status(401).json({ success: false, error: 'Invalid credentials' });
   }
 
+  // Mock data fallback for test publisher since TEST123 doesn't exist on Affise yet
+  if (publisher.sub_id === 'TEST123') {
+    return res.status(200).json({
+      success: true,
+      sub_id: publisher.sub_id,
+      data: {
+        clicks: 1250,
+        unique_clicks: 1100,
+        conversions: 45,
+        cr: "3.6%",
+        payout: 120.50
+      }
+    });
+  }
+
   const AFFISE_API_URL = 'https://digimcorps.g2afse.com/v1/stats/custom';
-  const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9'; // Apni real Affise API key yahan daal dena
+  const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
   try {
     const params = new URLSearchParams({
