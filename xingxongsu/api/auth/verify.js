@@ -45,7 +45,6 @@ export default async function handler(req, res) {
       'date_to': date_to || today
     });
 
-    // Agar specific fields bhejne hain toh aise append karein:
     const fields = ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout'];
     fields.forEach(field => params.append('fields[]', field));
 
@@ -53,7 +52,14 @@ export default async function handler(req, res) {
       headers: { 'api-key': AFFISE_API_KEY }
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+
+    // Check if API returned HTML instead of JSON
+    if (responseText.trim().startsWith('<')) {
+      throw new Error(`API returned HTML instead of JSON: ${responseText.substring(0, 100)}`);
+    }
+
+    const data = JSON.parse(responseText);
 
     return res.status(200).json({
       success: true,
@@ -61,6 +67,9 @@ export default async function handler(req, res) {
       data: data
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch stats from DB', details: err.message });
+    return res.status(500).json({ 
+      error: 'Failed to fetch stats from DB', 
+      details: err.message 
+    });
   }
 }
