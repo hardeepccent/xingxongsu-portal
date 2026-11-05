@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const AFFISE_API_URL = 'https://digimcorps.g2afse.com/v1/stats/custom';
+  const AFFISE_API_URL = 'https://digimcorps.g2afse.com/v1/stats';
   const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
   try {
