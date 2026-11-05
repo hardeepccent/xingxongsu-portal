@@ -5,13 +5,11 @@ export default async function handler(req, res) {
 
   const { loginId, password, date_from, date_to } = req.body;
 
-  // Vercel Environment Variable se publishers list uthayega (No file upload needed)
-  let publishers = [];
-  try {
-    publishers = JSON.parse(process.env.PUBLISHERS_DATA || '[]');
-  } catch (err) {
-    console.error('JSON Parse Error:', err);
-  }
+  // Publishers list with their respective sub_ids mapped to Affise
+  const publishers = [
+    { email: "test@gmail.com", phone: "TEST123", password: "password123", sub_id: "TEST123" }
+    // Yahan apne baaki real publishers bhi add kar sakta hai jinka real sub_id Affise mein hai
+  ];
 
   const publisher = publishers.find(
     p => (p.email === loginId || p.phone === loginId) && p.password === password
@@ -21,7 +19,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ success: false, error: 'Invalid credentials' });
   }
 
-  // Mock data fallback for test publisher since TEST123 doesn't exist on Affise yet
+  // Instant mock response only for test credentials to bypass missing stats on Affise side
   if (publisher.sub_id === 'TEST123') {
     return res.status(200).json({
       success: true,
@@ -59,6 +57,6 @@ export default async function handler(req, res) {
       data: data
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch stats' });
+    return res.status(500).json({ error: 'Failed to fetch stats from Affise' });
   }
 }
