@@ -34,7 +34,8 @@ export default async function handler(req, res) {
     });
   }
 
-  const AFFISE_API_URL = 'https://digimcorps.g2afse.com/3.0/stats/custom';
+  // Correct API domain found from Affise panel settings
+  const AFFISE_API_URL = 'https://api-digimcorps.affise.com/3.0/stats/custom';
   const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
   try {
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
 
     const params = new URLSearchParams();
     
-    // Required slice parameter based on docs
+    // Required slice parameter
     params.append('slice[]', 'offer');
 
     // Required date filters
