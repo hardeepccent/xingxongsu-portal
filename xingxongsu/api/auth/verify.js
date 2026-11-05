@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   const publishers = [
     { email: "test@gmail.com", phone: "TEST123", password: "password123", sub_id: "TEST123" },
     { email: "aarushi@mobpine.com", phone: "9876543210", password: "mobpine@123", sub_id: "224" }
-    // Yahan apne baaki real publishers bhi add kar sakta hai jinka real sub_id Affise mein hai
   ];
 
   const publisher = publishers.find(
@@ -20,7 +19,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ success: false, error: 'Invalid credentials' });
   }
 
-  // Instant mock response only for test credentials to bypass missing stats on Affise side
+  // Instant mock response only for test credentials
   if (publisher.sub_id === 'TEST123') {
     return res.status(200).json({
       success: true,
@@ -39,12 +38,16 @@ export default async function handler(req, res) {
   const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
   try {
+    const today = new Date().toISOString().split('T')[0];
     const params = new URLSearchParams({
       'filter[sub1]': publisher.sub_id,
-      'date_from': date_from || new Date().toISOString().split('T')[0],
-      'date_to': date_to || new Date().toISOString().split('T')[0],
-      'fields[]': ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout']
+      'date_from': date_from || today,
+      'date_to': date_to || today
     });
+
+    // Agar specific fields bhejne hain toh aise append karein:
+    const fields = ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout'];
+    fields.forEach(field => params.append('fields[]', field));
 
     const response = await fetch(`${AFFISE_API_URL}?${params.toString()}`, {
       headers: { 'api-key': AFFISE_API_KEY }
@@ -58,6 +61,6 @@ export default async function handler(req, res) {
       data: data
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch stats from Affise' });
+    return res.status(500).json({ error: 'Failed to fetch stats from DB', details: err.message });
   }
 }
