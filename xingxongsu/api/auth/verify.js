@@ -34,7 +34,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // Correct API domain found from Affise panel settings
   const AFFISE_API_URL = 'https://api-digimcorps.affise.com/3.0/stats/custom';
   const AFFISE_API_KEY = 'a2893a9e0e95db973f9d83a3a26dcfc9';
 
@@ -55,8 +54,8 @@ export default async function handler(req, res) {
     // Sub ID filter
     params.append('filter[sub1]', publisher.sub_id);
 
-    // Optional fields selection
-    const fields = ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout'];
+    // Using valid Affise v3.0 fields ('hosts' represents unique clicks)
+    const fields = ['clicks', 'hosts', 'conversions', 'cr', 'payouts'];
     fields.forEach(field => params.append('fields[]', field));
 
     const response = await fetch(`${AFFISE_API_URL}?${params.toString()}`, {
@@ -70,12 +69,39 @@ export default async function handler(req, res) {
       throw new Error(`API returned HTML instead of JSON: ${responseText.substring(0, 100)}`);
     }
 
-    const data = JSON.parse(responseText);
+    const jsonRes = JSON.parse(responseText);
+    let rawData = jsonRes.data || {};
+
+    let metrics = {
+      clicks: 0,
+      unique_clicks: 0,
+      conversions: 0,
+      cr: "0%",
+      payout: 0
+    };
+
+    if (Array.isArray(rawData)) {
+      rawData.forEach(row => {
+        metrics.clicks += Number(row.clicks || 0);
+        metrics.unique_clicks += Number(row.hosts || 0);
+        metrics.conversions += Number(row.conversions || 0);
+        metrics.payout += Number(row.payouts || 0);
+      });
+      if (metrics.clicks > 0) {
+        metrics.cr = ((metrics.conversions / metrics.clicks) * 100).toFixed(2) + "%";
+      }
+    } else if (typeof rawData === 'object' && rawData !== null) {
+      metrics.clicks = Number(rawData.clicks || 0);
+      metrics.unique_clicks = Number(rawData.hosts || 0);
+      metrics.conversions = Number(rawData.conversions || 0);
+      metrics.cr = rawData.cr ? rawData.cr + "%" : "0%";
+      metrics.payout = Number(rawData.payouts || 0);
+    }
 
     return res.status(200).json({
       success: true,
       sub_id: publisher.sub_id,
-      data: data
+      data: metrics
     });
   } catch (err) {
     return res.status(500).json({ 
