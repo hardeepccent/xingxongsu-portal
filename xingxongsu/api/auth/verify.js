@@ -42,16 +42,19 @@ export default async function handler(req, res) {
     const dFrom = date_from || today;
     const dTo = date_to || today;
 
-    // Affise v3.0 expects filters nested under filter[...] and slice parameters
-    const params = new URLSearchParams({
-      'filter[sub1]': publisher.sub_id,
-      'filter[date_from]': dFrom,
-      'filter[date_to]': dTo
-    });
-
-    // Add slices if required by custom stats endpoint
+    const params = new URLSearchParams();
+    
+    // Required slice parameter based on docs
     params.append('slice[]', 'offer');
 
+    // Required date filters
+    params.append('filter[date_from]', dFrom);
+    params.append('filter[date_to]', dTo);
+    
+    // Sub ID filter
+    params.append('filter[sub1]', publisher.sub_id);
+
+    // Optional fields selection
     const fields = ['clicks', 'unique_clicks', 'conversions', 'cr', 'payout'];
     fields.forEach(field => params.append('fields[]', field));
 
