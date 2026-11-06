@@ -22,11 +22,11 @@ export async function GET(request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        slice: ["pid"],
+        slice: ["day"],
         filter: {
           date_from: startDate,
           date_to: endDate,
-          pid: Number(subId)
+          affiliate: Number(subId)
         }
       })
     });
@@ -44,23 +44,36 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    const statsObj = data?.data?.[0] || data?.stats || {};
-    const uniqueClicks = statsObj?.unique_clicks || statsObj?.clicks || 0;
-    const conversions = statsObj?.conversions || 0;
-    const payout = statsObj?.payout || 0;
-    const clicks = uniqueClicks;
+    console.log("AFFISE RAW RESPONSE:", JSON.stringify(data, null, 2));
 
-    const calculatedCr = uniqueClicks > 0 ? ((conversions / uniqueClicks) * 100).toFixed(2) : '0';
+    // Affise custom stats returns rows in data array
+    const statsList = data?.data || [];
+    
+    let totalClicks = 0;
+    let totalConversions = 0;
+    let totalPayout = 0;
+
+    statsList.forEach(row => {
+      const clicks = Number(row?.clicks || row?.unique_clicks || 0);
+      const conversions = Number(row?.actions || row?.conversions || 0);
+      const payout = Number(row?.payout || row?.revenue || 0);
+
+      totalClicks += clicks;
+      totalConversions += conversions;
+      totalPayout += payout;
+    });
+
+    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
     const cr = `${calculatedCr}%`;
 
     return NextResponse.json({
       success: true,
       data: {
-        clicks,
-        unique_clicks: uniqueClicks,
-        conversions,
+        clicks: totalClicks,
+        unique_clicks: totalClicks,
+        conversions: totalConversions,
         cr,
-        payout
+        payout: totalPayout.toFixed(2)
       }
     });
 
