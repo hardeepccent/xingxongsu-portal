@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
+// Agar tu Prisma use kar raha hai toh yeh uncomment kar lena:
+// import { db } from '@/lib/db'; 
 
 export async function GET(request) {
   try {
-    const apiKey = 'a2893a9e0e95db973f9d83a3a26dcfc9';
-    
     const url = new URL(request.url);
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
@@ -13,8 +13,20 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Panel wala exact endpoint 'stats' with affiliates and by_day slice
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats?slice=by_day&affiliates=${subId}&date_from=${startDate}&date_to=${endDate}`;
+    // STEP 1: Database se us subId (publisher) ki stored API key nikal lo
+    // Yahan apna DB query lagana (Example Prisma ka niche diya hai):
+    // const publisher = await db.publisher.findFirst({ where: { subId: String(subId) } });
+    // const apiKey = publisher?.apiKey;
+
+    // Filhal testing ke liye yahan apni publisher ki real API key dal dena:
+    const apiKey = 'YAHAN_PUBLISHER_KI_APNI_API_KEY_DAAL_DENA';
+
+    if (!apiKey || apiKey === 'YAHAN_PUBLISHER_KI_APNI_API_KEY_DAAL_DENA') {
+      return NextResponse.json({ success: false, message: 'API key not found for this publisher in database' }, { status: 401 });
+    }
+
+    // STEP 2: Publisher ki apni key hai, toh Affise direct unka data dega bina kisi extra filter ke
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&timezone=Asia%2FKolkata`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
@@ -35,8 +47,6 @@ export async function GET(request) {
         raw: textResponse.substring(0, 200) 
       }, { status: 500 });
     }
-
-    console.log("AFFISE PANEL STATS RESPONSE:", JSON.stringify(data, null, 2));
 
     const statsList = data?.data || data?.rows || (Array.isArray(data) ? data : []);
     
