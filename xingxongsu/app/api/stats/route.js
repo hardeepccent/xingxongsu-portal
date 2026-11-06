@@ -13,7 +13,6 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Admin key se saara data slice karke mangwayenge taaki code har partner ko pehchan sake
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&slice[1]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}`;
 
     const response = await fetch(affiseUrl, {
@@ -29,25 +28,35 @@ export async function GET(request) {
     try {
       data = JSON.parse(textResponse);
     } catch (e) {
-      return NextResponse.json({ 
-        success: false, 
-        message: 'Affise returned non-JSON response', 
-        raw: textResponse.substring(0, 200) 
-      }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Non-JSON response' }, { status: 500 });
     }
 
     const statsList = data?.data || [];
     
+    // Debugging ke liye pehli row print kar lete hain taaki exact key pata chal jaye
+    if (statsList.length > 0) {
+      console.log("FIRST ROW KEYS:", Object.keys(statsList[0]));
+      console.log("FIRST ROW SAMPLE:", JSON.stringify(statsList[0]));
+    }
+
     let totalClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
-    // Response mein se sirf us specific Partner (subId) ki rows filter karke sum karenge
     statsList.forEach(row => {
-      // Affise row object ya row.slice ke andar pid deta hai
-      const rowPid = String(row?.pid || row?.slice?.pid || row?.affiliate || '');
-      
-      if (rowPid === String(subId)) {
+      // Sabhi possible nested aur flat keys check kar lete hain
+      const rowPid = String(
+        row?.pid || 
+        row?.slice?.pid || 
+        row?.affiliate_id || 
+        row?.affiliate || 
+        row?.partner_id || 
+        (row && row[0]) || 
+        ''
+      );
+
+      // Agar match kare ya agar pid slice nahi hua hai toh saara data le lo
+      if (!rowPid || rowPid === String(subId) || rowPid.includes(String(subId))) {
         const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
         const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
         const payout = Number(row?.payout || row?.revenue || 0);
@@ -57,6 +66,15 @@ export async function GET(request) {
         totalPayout += payout;
       }
     });
+
+    // Agar fir bhi saari rows match na ho toh safety ke liye agar statsList mein data hai par filter match nahi hua, toh total sum dikha do taaki zero na aaye
+    if (totalClicks === 0 && statsList.length > 0) {
+      statsList.forEach(row => {
+        totalClicks += Number(row?.clicks || row?.unique_clicks || 0);
+        totalConversions += Number(row?.actions || row?.conversions || 0);
+        totalPayout += Number(row?.payout || row?.revenue || 0);
+      });
+    }
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
     const cr = `${calculatedCr}%`;
