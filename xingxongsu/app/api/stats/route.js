@@ -13,8 +13,8 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Panel payload ke mutabiq exact affiliate_id aur slice parameter
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&affiliate_id=${subId}`;
+    // Panel ke exact URL parameter 'affiliates' ka use karte hain
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&affiliates=${subId}`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
