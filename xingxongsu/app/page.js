@@ -4,7 +4,7 @@ import { useState } from 'react';
 export default function Dashboard() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [stats, setStats] = useState([]);
+  const [metrics, setMetrics] = useState({ clicks: 0, unique_clicks: 0, conversions: 0, cr: '0%', payout: 0 });
   const [loading, setLoading] = useState(false);
 
   const fetchMetrics = async () => {
@@ -17,7 +17,9 @@ export default function Dashboard() {
     try {
       const res = await fetch(`/api/stats?startDate=${startDate}&endDate=${endDate}`);
       const result = await res.json();
-      setStats(result.data || result.stats || []);
+      if (result.success && result.data) {
+        setMetrics(result.data);
+      }
     } catch (err) {
       console.error('Error fetching stats:', err);
     } finally {
@@ -61,37 +63,28 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Data Table Section */}
-      <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px' }}>
-        <h3 style={{ marginBottom: '15px' }}>Offer Performance</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #30363d', color: '#8b949e', fontSize: '14px' }}>
-              <th style={{ padding: '10px' }}>Offer ID</th>
-              <th style={{ padding: '10px' }}>Clicks</th>
-              <th style={{ padding: '10px' }}>Conversions</th>
-              <th style={{ padding: '10px' }}>Payout</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stats.length > 0 ? (
-              stats.map((item, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '10px' }}>{item.offer_id || item.offer || 'N/A'}</td>
-                  <td style={{ padding: '10px' }}>{item.clicks || 0}</td>
-                  <td style={{ padding: '10px' }}>{item.conversions || 0}</td>
-                  <td style={{ padding: '10px' }}>${item.payout || 0}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#8b949e' }}>
-                  {loading ? 'Loading data from Affise...' : 'No data found. Select date range and click Fetch Metrics.'}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Metrics Cards Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+        <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', border: '1px solid #30363d' }}>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>TOTAL CLICKS</div>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#58a6ff' }}>{metrics.clicks}</div>
+        </div>
+        <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', border: '1px solid #30363d' }}>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>UNIQUE CLICKS</div>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3fb950' }}>{metrics.unique_clicks}</div>
+        </div>
+        <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', border: '1px solid #30363d' }}>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>CONVERSIONS</div>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d29922' }}>{metrics.conversions}</div>
+        </div>
+        <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', border: '1px solid #30363d' }}>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>CONVERSION RATE</div>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f78166' }}>{metrics.cr}</div>
+        </div>
+        <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', border: '1px solid #30363d' }}>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>PAYOUT</div>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2ea043' }}>${metrics.payout}</div>
+        </div>
       </div>
     </div>
   );
