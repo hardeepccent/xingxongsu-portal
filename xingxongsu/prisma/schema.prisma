@@ -1,7 +1,0 @@
-model Publisher {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  subId     String   // Publisher ki Sub ID (jaise 224)
-  apiKey    String?  // <-- Yahan add karna hai bhai (Publisher ki apni Affise API key)
-  createdAt DateTime @default(now())
-}
