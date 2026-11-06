@@ -24,7 +24,7 @@ export async function GET(request) {
     });
 
     const data = await response.json();
-
+    console.log("AFFISE RAW RESPONSE:", JSON.stringify(data, null, 2));
     const uniqueClicks = data?.stats?.unique_clicks || 0;
     const conversions = data?.stats?.conversions || 0;
     const payout = data?.stats?.payout || 0;
