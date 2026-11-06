@@ -96,3 +96,4 @@ export default function Dashboard() {
     </div>
   );
 }
+// Last updated: November 2026
