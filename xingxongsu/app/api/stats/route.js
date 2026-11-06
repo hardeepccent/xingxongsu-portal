@@ -26,7 +26,7 @@ export async function GET(request) {
         filter: {
           date_from: startDate,
           date_to: endDate,
-          pid: Number(subId)
+          sub1: subId
         }
       })
     });
