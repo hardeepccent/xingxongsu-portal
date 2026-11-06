@@ -34,17 +34,45 @@ export async function GET(request) {
     });
 
     const textResponse = await response.text();
-    let data;
+    let jsonResponse;
     try {
-      data = JSON.parse(textResponse);
+      jsonResponse = JSON.parse(textResponse);
     } catch (e) {
       return NextResponse.json({ success: false, message: 'Non-JSON response from Affise' }, { status: 500 });
     }
 
-    // Yahan hum raw response check karne ke liye return kar rahe hain ki Affise kya de raha hai
+    // Affise response se rows/data extract karna
+    const rawData = jsonResponse?.data || jsonResponse;
+    const statsList = Array.isArray(rawData) ? rawData : (rawData?.rows || rawData?.list || []);
+    
+    let totalClicks = 0;
+    let totalConversions = 0;
+    let totalPayout = 0;
+
+    if (Array.isArray(statsList)) {
+      statsList.forEach(row => {
+        // Affise fields: clicks, actions/conversions, payout/revenue
+        const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || row?.stats?.clicks || 0);
+        const conversions = Number(row?.actions?.confirmed || row?.actions?.total || row?.conversions || row?.approved || row?.stats?.conversions || 0);
+        const payout = Number(row?.payout?.confirmed || row?.payout?.total || row?.payout || row?.revenue || row?.earnings || 0);
+
+        totalClicks += clicks;
+        totalConversions += conversions;
+        totalPayout += payout;
+      });
+    }
+
+    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
+
     return NextResponse.json({
       success: true,
-      rawAffiseResponse: data, // Yeh batayega ki andar data kis format mein aa raha hai
+      data: {
+        clicks: totalClicks,
+        unique_clicks: totalClicks,
+        conversions: totalConversions,
+        cr: `${calculatedCr}%`,
+        payout: Number(totalPayout).toFixed(2)
+      }
     });
 
   } catch (error) {
