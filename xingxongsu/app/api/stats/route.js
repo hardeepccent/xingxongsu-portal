@@ -19,8 +19,8 @@ export async function GET(request) {
     const publisher = PUBLISHERS_DB.find(p => String(p.sub_id).trim() === String(subId).trim());
     const apiKey = publisher?.apiKey;
 
-    if (!apiKey || apiKey.startsWith('YAHAN_')) {
-      return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
+    if (!apiKey) {
+      return NextResponse.json({ success: false, message: 'API key not found' }, { status: 401 });
     }
 
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&timezone=Asia%2FKolkata`;
@@ -38,41 +38,13 @@ export async function GET(request) {
     try {
       jsonResponse = JSON.parse(textResponse);
     } catch (e) {
-      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise' }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Non-JSON response', raw: textResponse }, { status: 500 });
     }
 
-    // Affise response se rows/data extract karna
-    const rawData = jsonResponse?.data || jsonResponse;
-    const statsList = Array.isArray(rawData) ? rawData : (rawData?.rows || rawData?.list || []);
-    
-    let totalClicks = 0;
-    let totalConversions = 0;
-    let totalPayout = 0;
-
-    if (Array.isArray(statsList)) {
-      statsList.forEach(row => {
-        // Affise fields: clicks, actions/conversions, payout/revenue
-        const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || row?.stats?.clicks || 0);
-        const conversions = Number(row?.actions?.confirmed || row?.actions?.total || row?.conversions || row?.approved || row?.stats?.conversions || 0);
-        const payout = Number(row?.payout?.confirmed || row?.payout?.total || row?.payout || row?.revenue || row?.earnings || 0);
-
-        totalClicks += clicks;
-        totalConversions += conversions;
-        totalPayout += payout;
-      });
-    }
-
-    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
-
+    // Yahan hum direct Affise ka raw JSON bhej rahe hain taaki pata chale data kahan hai
     return NextResponse.json({
       success: true,
-      data: {
-        clicks: totalClicks,
-        unique_clicks: totalClicks,
-        conversions: totalConversions,
-        cr: `${calculatedCr}%`,
-        payout: Number(totalPayout).toFixed(2)
-      }
+      rawAffiseData: jsonResponse
     });
 
   } catch (error) {
