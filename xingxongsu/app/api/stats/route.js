@@ -13,15 +13,20 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Affise admin stats endpoint with direct pid query parameter without brackets
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?date_from=${startDate}&date_to=${endDate}&pid=${subId}`;
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom`;
 
     const response = await fetch(affiseUrl, {
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'api-key': apiKey,
+        'API-Key': apiKey,
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({
+        date_from: startDate,
+        date_to: endDate,
+        pid: Number(subId),
+        slice: ["day"]
+      })
     });
 
     const textResponse = await response.text();
@@ -36,9 +41,9 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    console.log("AFFISE DIRECT PID STATS:", JSON.stringify(data, null, 2));
+    console.log("AFFISE FINAL DATA:", JSON.stringify(data, null, 2));
 
-    const statsList = data?.data || (Array.isArray(data) ? data : []);
+    const statsList = data?.data || [];
     
     let totalClicks = 0;
     let totalConversions = 0;
