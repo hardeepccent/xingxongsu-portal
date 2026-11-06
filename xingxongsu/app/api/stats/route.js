@@ -13,8 +13,8 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Affise stats endpoint without empty slice parameters
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?filter[date_from]=${startDate}&filter[date_to]=${endDate}`;
+    // Panel wala exact endpoint 'stats' with affiliates and by_day slice
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats?slice=by_day&affiliates=${subId}&date_from=${startDate}&date_to=${endDate}`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
@@ -36,23 +36,22 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    const statsList = data?.data || (Array.isArray(data) ? data : []);
+    console.log("AFFISE PANEL STATS RESPONSE:", JSON.stringify(data, null, 2));
+
+    const statsList = data?.data || data?.rows || (Array.isArray(data) ? data : []);
     
     let totalClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
     statsList.forEach(row => {
-      const rowPid = String(row?.pid || row?.affiliate || row?.partner || '');
-      if (!rowPid || rowPid === String(subId)) {
-        const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
-        const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
-        const payout = Number(row?.payout || row?.revenue || 0);
+      const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
+      const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
+      const payout = Number(row?.payout || row?.revenue || row?.earnings || 0);
 
-        totalClicks += clicks;
-        totalConversions += conversions;
-        totalPayout += payout;
-      }
+      totalClicks += clicks;
+      totalConversions += conversions;
+      totalPayout += payout;
     });
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
