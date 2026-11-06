@@ -41,29 +41,10 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Non-JSON response from Affise' }, { status: 500 });
     }
 
-    const statsList = data?.data || data?.rows || (Array.isArray(data) ? data : []);
-    
-    let totalClicks = 0;
-    let totalConversions = 0;
-    let totalPayout = 0;
-
-    statsList.forEach(row => {
-      totalClicks += Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
-      totalConversions += Number(row?.actions || row?.conversions || row?.approved || 0);
-      totalPayout += Number(row?.payout || row?.revenue || row?.earnings || 0);
-    });
-
-    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
-
+    // Yahan hum raw response check karne ke liye return kar rahe hain ki Affise kya de raha hai
     return NextResponse.json({
       success: true,
-      data: {
-        clicks: totalClicks,
-        unique_clicks: totalClicks,
-        conversions: totalConversions,
-        cr: `${calculatedCr}%`,
-        payout: Number(totalPayout).toFixed(2)
-      }
+      rawAffiseResponse: data, // Yeh batayega ki andar data kis format mein aa raha hai
     });
 
   } catch (error) {
