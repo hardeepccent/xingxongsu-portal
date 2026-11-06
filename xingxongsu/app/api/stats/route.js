@@ -14,7 +14,7 @@ export async function GET(request) {
     }
 
     // Affise documentation ke according exact endpoint aur filter parameters
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[pid]=${subId}`;
+    const affiseUrl = `https://offers-digimcorps.affise.com/3.0/stats/custom?slice[0]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[pid]=${subId}`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
