@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-// Agar tu Prisma use kar raha hai toh yeh uncomment kar lena:
-// import { db } from '@/lib/db'; 
+import { PUBLISHERS_DB } from '@/lib/publishers';
 
 export async function GET(request) {
   try {
@@ -13,19 +12,15 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // STEP 1: Database se us subId (publisher) ki stored API key nikal lo
-    // Yahan apna DB query lagana (Example Prisma ka niche diya hai):
-    // const publisher = await db.publisher.findFirst({ where: { subId: String(subId) } });
-    // const apiKey = publisher?.apiKey;
+    // Shared list se sub_id ke hisab se API key nikal lo
+    const publisher = PUBLISHERS_DB.find(p => String(p.sub_id) === String(subId));
+    const apiKey = publisher?.apiKey;
 
-    // Filhal testing ke liye yahan apni publisher ki real API key dal dena:
-    const apiKey = 'YAHAN_PUBLISHER_KI_APNI_API_KEY_DAAL_DENA';
-
-    if (!apiKey || apiKey === 'YAHAN_PUBLISHER_KI_APNI_API_KEY_DAAL_DENA') {
-      return NextResponse.json({ success: false, message: 'API key not found for this publisher in database' }, { status: 401 });
+    if (!apiKey) {
+      return NextResponse.json({ success: false, message: 'API key not found for this sub_id' }, { status: 401 });
     }
 
-    // STEP 2: Publisher ki apni key hai, toh Affise direct unka data dega bina kisi extra filter ke
+    // Yeh raha tera exact original aur correct Affise API domain
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&timezone=Asia%2FKolkata`;
 
     const response = await fetch(affiseUrl, {
@@ -41,11 +36,7 @@ export async function GET(request) {
     try {
       data = JSON.parse(textResponse);
     } catch (e) {
-      return NextResponse.json({ 
-        success: false, 
-        message: 'Affise returned non-JSON response', 
-        raw: textResponse.substring(0, 200) 
-      }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise' }, { status: 500 });
     }
 
     const statsList = data?.data || data?.rows || (Array.isArray(data) ? data : []);
@@ -55,17 +46,12 @@ export async function GET(request) {
     let totalPayout = 0;
 
     statsList.forEach(row => {
-      const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
-      const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
-      const payout = Number(row?.payout || row?.revenue || row?.earnings || 0);
-
-      totalClicks += clicks;
-      totalConversions += conversions;
-      totalPayout += payout;
+      totalClicks += Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
+      totalConversions += Number(row?.actions || row?.conversions || row?.approved || 0);
+      totalPayout += Number(row?.payout || row?.revenue || row?.earnings || 0);
     });
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
-    const cr = `${calculatedCr}%`;
 
     return NextResponse.json({
       success: true,
@@ -73,7 +59,7 @@ export async function GET(request) {
         clicks: totalClicks,
         unique_clicks: totalClicks,
         conversions: totalConversions,
-        cr,
+        cr: `${calculatedCr}%`,
         payout: Number(totalPayout).toFixed(2)
       }
     });
