@@ -13,21 +13,27 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Affise documentation ke according exact endpoint aur filter parameters
-    const affiseUrl = `https://offers-digimcorps.affise.com/3.0/stats/custom?slice[0]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[pid]=${subId}`;
+    const affiseUrl = `https://offers-digimcorps.affise.com/3.0/stats/custom`;
 
     const response = await fetch(affiseUrl, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'api-key': apiKey,
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        slice: ["pid"],
+        filter: {
+          date_from: startDate,
+          date_to: endDate,
+          pid: Number(subId)
+        }
+      })
     });
 
     const data = await response.json();
     console.log("AFFISE RAW RESPONSE:", JSON.stringify(data, null, 2));
 
-    // Response structure ke mutabiq data nikalna
     const statsObj = data?.data?.[0] || data?.stats || {};
     const uniqueClicks = statsObj?.unique_clicks || statsObj?.clicks || 0;
     const conversions = statsObj?.conversions || 0;
