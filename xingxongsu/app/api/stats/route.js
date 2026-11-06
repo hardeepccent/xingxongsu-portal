@@ -31,8 +31,18 @@ export async function GET(request) {
       })
     });
 
-    const data = await response.json();
-    console.log("AFFISE RAW RESPONSE:", JSON.stringify(data, null, 2));
+    const textResponse = await response.text();
+    let data;
+    try {
+      data = JSON.parse(textResponse);
+    } catch (e) {
+      console.error("AFFISE NON-JSON RESPONSE:", textResponse);
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Affise returned non-JSON response', 
+        raw: textResponse.substring(0, 200) 
+      }, { status: 500 });
+    }
 
     const statsObj = data?.data?.[0] || data?.stats || {};
     const uniqueClicks = statsObj?.unique_clicks || statsObj?.clicks || 0;
