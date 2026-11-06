@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+
+// Direct publishers list taaki Vercel par file-system read error (FUNCTION_INVOCATION_FAILED) na aaye
+const publishers = [
+  { email: "aarushi@mobpine.com", password: "password123", sub_id: "224" },
+  // Agar aur bhi publishers hain toh unhe yahan add kar sakta hai
+];
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json();
-
-    const filePath = path.join(process.cwd(), 'data', 'publishers.json');
-    const fileData = fs.readFileSync(filePath, 'utf8');
-    const publishers = JSON.parse(fileData);
+    const body = await request.json();
+    const { email, password } = body;
 
     const publisher = publishers.find(
       (p) => p.email === email && p.password === password
@@ -28,7 +29,7 @@ export async function POST(request) {
     }
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: 'Server error' },
+      { success: false, message: 'Server error: ' + error.message },
       { status: 500 }
     );
   }
