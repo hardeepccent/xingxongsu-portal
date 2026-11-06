@@ -13,7 +13,6 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Bina extra filter fields ke request bhejte hain taaki API error na de
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&slice[1]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}`;
 
     const response = await fetch(affiseUrl, {
@@ -37,15 +36,18 @@ export async function GET(request) {
     }
 
     const statsList = data?.data || [];
+    console.log("AFFISE STATS ROWS SAMPLE:", JSON.stringify(statsList.slice(0, 3), null, 2));
     
     let totalClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
-    // Response se sirf matching subId (pid) wale rows ko filter karke sum karenge
     statsList.forEach(row => {
-      const rowPid = String(row?.pid || row?.affiliate || row?.partner || '');
-      if (rowPid === String(subId)) {
+      // Saari possible keys check kar lete hain jisme partner ID aa sakti hai
+      const rowPid = String(row?.pid || row?.affiliate || row?.partner || row?.slice?.pid || '');
+      
+      // Agar subId match ho jaye ya agar row mein pid match na mile toh sabhi ka sum dekhne ke liye temporarily condition loose kar sakte hain
+      if (rowPid === String(subId) || !rowPid) {
         const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
         const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
         const payout = Number(row?.payout || row?.revenue || 0);
