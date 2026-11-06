@@ -26,7 +26,7 @@ export async function GET(request) {
         filter: {
           date_from: startDate,
           date_to: endDate,
-          sub1: subId
+          pid: [Number(subId)]
         }
       })
     });
@@ -42,6 +42,8 @@ export async function GET(request) {
         raw: textResponse.substring(0, 200) 
       }, { status: 500 });
     }
+
+    console.log("AFFISE RAW DATA:", JSON.stringify(data, null, 2));
 
     const statsList = data?.data || [];
     
