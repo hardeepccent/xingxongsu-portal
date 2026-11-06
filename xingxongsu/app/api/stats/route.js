@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 const PUBLISHERS_DB = [
   { email: 'test@publisher.com', password: '123456', sub_id: '57', apiKey: 'YAHAN_PUBLISHER_57_KI_API_KEY' },
-  { email: 'aarushi@mobpine.com', password: 'password123', sub_id: '224', apiKey: 'a2893a9e0e95db973f9d83a3a26dcfc9' }
+  { email: 'aarushi@mobpine.com', password: 'password123', sub_id: '224', apiKey: 'f659b021997bb8dce0eb2e0f30b67207' }
 ];
 
 export async function GET(request) {
@@ -16,11 +16,11 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    const publisher = PUBLISHERS_DB.find(p => String(p.sub_id) === String(subId));
+    const publisher = PUBLISHERS_DB.find(p => String(p.sub_id).trim() === String(subId).trim());
     const apiKey = publisher?.apiKey;
 
-    if (!apiKey) {
-      return NextResponse.json({ success: false, message: 'API key not found for this sub_id' }, { status: 401 });
+    if (!apiKey || apiKey.startsWith('YAHAN_')) {
+      return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&timezone=Asia%2FKolkata`;
