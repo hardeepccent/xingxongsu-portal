@@ -13,7 +13,6 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Affise standard GET query parameter format for custom stats
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[pid]=${subId}`;
 
     const response = await fetch(affiseUrl, {
@@ -36,18 +35,19 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    console.log("AFFISE RAW DATA:", JSON.stringify(data, null, 2));
+    console.log("AFFISE FULL RAW JSON:", JSON.stringify(data, null, 2));
 
-    const statsList = data?.data || [];
+    const statsList = data?.data || data?.rows || (Array.isArray(data) ? data : []);
     
     let totalClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
     statsList.forEach(row => {
-      const clicks = Number(row?.clicks || row?.unique_clicks || 0);
-      const conversions = Number(row?.actions || row?.conversions || 0);
-      const payout = Number(row?.payout || row?.revenue || 0);
+      // Check all possible key variations returned by Affise stats API
+      const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || row?.unique || 0);
+      const conversions = Number(row?.actions || row?.conversions || row?.approved || row?.confirmed || 0);
+      const payout = Number(row?.payout || row?.revenue || row?.approved_revenue || 0);
 
       totalClicks += clicks;
       totalConversions += conversions;
