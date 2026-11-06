@@ -13,20 +13,15 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom`;
+    // Panel payload ke mutabiq exact affiliate_id aur slice parameter
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=by_day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&affiliate_id=${subId}`;
 
     const response = await fetch(affiseUrl, {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'API-Key': apiKey,
+        'api-key': apiKey,
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        date_from: startDate,
-        date_to: endDate,
-        pid: Number(subId),
-        slice: ["day"]
-      })
+      }
     });
 
     const textResponse = await response.text();
@@ -40,8 +35,6 @@ export async function GET(request) {
         raw: textResponse.substring(0, 200) 
       }, { status: 500 });
     }
-
-    console.log("AFFISE FINAL DATA:", JSON.stringify(data, null, 2));
 
     const statsList = data?.data || [];
     
