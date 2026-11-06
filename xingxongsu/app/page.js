@@ -1,122 +1,92 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [statsData, setStatsData] = useState([]);
+  const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Aaj ki date default set karne ke liye
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setStartDate(today);
-    setEndDate(today);
-  }, []);
-
-  const fetchStats = async (forceRefresh = false) => {
-    if (!startDate || !endDate) return;
-    
-    const cacheKey = `affise_stats_${startDate}_${endDate}`;
-    const cachedTimeKey = `${cacheKey}_time`;
-    const now = new Date().getTime();
-
-    // 1. Check LocalStorage Cache (5 minutes TTL)
-    if (!forceRefresh) {
-      const cachedData = localStorage.getItem(cacheKey);
-      const cachedTime = localStorage.getItem(cachedTimeKey);
-      if (cachedData && cachedTime && (now - cachedTime < 300000)) {
-        console.log("Loaded from Local Cache (0 API Cost)");
-        setStatsData(JSON.parse(cachedData));
-        return;
-      }
+  const fetchMetrics = async () => {
+    if (!startDate || !endDate) {
+      alert('Please select both start and end dates');
+      return;
     }
 
-    // 2. Fetch Fresh Data
     setLoading(true);
     try {
-      const res = await fetch(`/api/stats?from=${startDate}&to=${endDate}`);
-      const json = await res.json();
-      
-      const results = json.data || []; // Affise response structure ke mutabiq adjust kar le
-      setStatsData(results);
-
-      // Save to LocalStorage
-      localStorage.setItem(cacheKey, JSON.stringify(results));
-      localStorage.setItem(cachedTimeKey, now);
+      const res = await fetch(`/api/stats?startDate=${startDate}&endDate=${endDate}`);
+      const result = await res.json();
+      // Assuming Affise returns data in result.stats or result.data array
+      setStats(result.data || result.stats || []);
     } catch (err) {
-      console.error("Error fetching stats:", err);
+      console.error('Error fetching stats:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Affise Analytics Dashboard</h1>
+    <div style={{ padding: '20px', color: '#fff', background: '#0b0f19', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161b22', padding: '15px 20px', borderRadius: '8px', marginBottom: '20px' }}>
+        <h2>Welcome Partner</h2>
+        <span style={{ color: '#8b949e' }}>ID: 224</span>
+      </div>
 
-      {/* Date Filters & Buttons */}
-      <div className="flex gap-4 mb-6 items-center bg-gray-100 p-4 rounded-lg">
+      {/* Date Range Picker Section */}
+      <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px', display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <label className="block text-sm font-medium">From:</label>
+          <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>START DATE</label>
           <input 
             type="date" 
             value={startDate} 
-            onChange={(e) => setStartDate(e.target.value)} 
-            className="border p-2 rounded"
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{ padding: '8px', background: '#0d1117', border: '1px solid #30363d', color: '#fff', borderRadius: '4px' }}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">To:</label>
+          <label style={{ display: 'block', fontSize: '12px', color: '#8b949e', marginBottom: '5px' }}>END DATE</label>
           <input 
             type="date" 
             value={endDate} 
-            onChange={(e) => setEndDate(e.target.value)} 
-            className="border p-2 rounded"
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{ padding: '8px', background: '#0d1117', border: '1px solid #30363d', color: '#fff', borderRadius: '4px' }}
           />
         </div>
         <button 
-          onClick={() => fetchStats(false)}
-          className="bg-blue-600 text-white px-4 py-2 rounded mt-5 hover:bg-blue-700"
+          onClick={fetchMetrics}
+          style={{ marginTop: '18px', padding: '9px 20px', background: '#238636', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
         >
-          {loading ? 'Loading...' : 'Fetch Stats'}
-        </button>
-        <button 
-          onClick={() => fetchStats(true)}
-          className="bg-gray-600 text-white px-4 py-2 rounded mt-5 hover:bg-gray-700"
-          title="Bypasses cache and fetches fresh data from Affise"
-        >
-          Force Refresh
+          {loading ? 'Fetching...' : 'Fetch Metrics'}
         </button>
       </div>
 
-      {/* Data Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+      {/* Offer-wise Data Table */}
+      <div style={{ background: '#161b22', padding: '20px', borderRadius: '8px' }}>
+        <h3>Traffic Performance</h3>
+        <table style={{ width: '100%', marginTop: '15px', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 p-2">Offer ID</th>
-              <th className="border border-gray-300 p-2">Offer Name</th>
-              <th className="border border-gray-300 p-2">Clicks</th>
-              <th className="border border-gray-300 p-2">Conversions</th>
-              <th className="border border-gray-300 p-2">CR (%)</th>
+            <tr style={{ borderBottom: '1px solid #30363d', color: '#8b949e' }}>
+              <th style={{ padding: '10px' }}>Offer ID</th>
+              <th style={{ padding: '10px' }}>Offer Name</th>
+              <th style={{ padding: '10px' }}>Clicks</th>
+              <th style={{ padding: '10px' }}>Conversions</th>
             </tr>
           </thead>
           <tbody>
-            {statsData.length > 0 ? (
-              statsData.map((row, index) => (
-                <tr key={index} className="text-center">
-                  <td className="border border-gray-300 p-2">{row.offer_id}</td>
-                  <td className="border border-gray-300 p-2 font-medium">{row.offer_name || 'N/A'}</td>
-                  <td className="border border-gray-300 p-2">{row.clicks}</td>
-                  <td className="border border-gray-300 p-2">{row.conversions}</td>
-                  <td className="border border-gray-300 p-2">{row.cr}%</td>
+            {stats.length > 0 ? (
+              stats.map((row, index) => (
+                <tr key={index} style={{ borderBottom: '1px solid #21262d' }}>
+                  <td style={{ padding: '10px' }}>{row.offer_id}</td>
+                  <td style={{ padding: '10px' }}>{row.offer_name || 'N/A'}</td>
+                  <td style={{ padding: '10px' }}>{row.clicks || 0}</td>
+                  <td style={{ padding: '10px' }}>{row.conversions || 0}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="p-4 text-center text-gray-500">
-                  No data found for selected dates. Click 'Fetch Stats'.
+                <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#8b949e' }}>
+                  No data found. Select date range and click fetch.
                 </td>
               </tr>
             )}
