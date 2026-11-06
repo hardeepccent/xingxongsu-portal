@@ -17,7 +17,7 @@ export default function Portal() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('/api/auth/verify', {
+      const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -46,6 +46,8 @@ export default function Portal() {
       const result = await res.json();
       if (result.success && result.data) {
         setMetrics(result.data);
+      } else {
+        alert(result.message || 'Failed to fetch stats');
       }
     } catch (err) {
       console.error('Error fetching stats:', err);
@@ -161,4 +163,3 @@ export default function Portal() {
     </div>
   );
 }
-// Force fresh deployment update
