@@ -5,7 +5,6 @@ export async function GET(request) {
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
 
-  // Affise API URL with date range and grouping by offer_id
   const affiseUrl = `https://api-affise.com/3.0/stats/custom?date_from=${startDate}&date_to=${endDate}&group[0]=offer_id`;
 
   try {
