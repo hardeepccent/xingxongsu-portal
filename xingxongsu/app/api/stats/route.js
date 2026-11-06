@@ -13,7 +13,7 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    const affiseUrl = `https://offers-digimcorps.affise.com/3.0/stats/custom`;
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom`;
 
     const response = await fetch(affiseUrl, {
       method: 'POST',
