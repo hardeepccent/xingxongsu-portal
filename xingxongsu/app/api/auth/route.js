@@ -1,28 +1,31 @@
-export default function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
-  }
+import { NextResponse } from 'next/server';
 
-  const { email, password } = req.body;
+const PUBLISHERS_DB = [
+  { email: 'test@publisher.com', password: '123456', sub_id: '57' },
+  { email: 'aarushi@mobpine.com', password: 'password123', sub_id: '224' }
+];
 
-  const publishers = [
-    { email: "aarushi@mobpine.com", password: "password123", sub_id: "224" },
-  ];
+export async function POST(request) {
+  try {
+    const { email, password } = await request.json();
 
-  const publisher = publishers.find(
-    (p) => p.email === email && p.password === password
-  );
+    const publisher = PUBLISHERS_DB.find(
+      (p) => p.email === email && p.password === password
+    );
 
-  if (publisher) {
-    return res.status(200).json({
-      success: true,
-      sub_id: publisher.sub_id,
-      message: 'Login successful',
-    });
-  } else {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid email or password',
-    });
+    if (publisher) {
+      return NextResponse.json({
+        success: true,
+        sub_id: publisher.sub_id,
+        message: 'Login successful'
+      });
+    } else {
+      return NextResponse.json({
+        success: false,
+        message: 'Invalid email or password'
+      }, { status: 401 });
+    }
+  } catch (error) {
+    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }
