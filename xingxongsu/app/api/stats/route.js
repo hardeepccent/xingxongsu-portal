@@ -13,8 +13,8 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Dates and Sub ID are required' }, { status: 400 });
     }
 
-    // Affise v3 standard array filter format for affiliates
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[affiliates][0]=${subId}`;
+    // Admin key se saara data slice karke mangwayenge taaki code har partner ko pehchan sake
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/custom?slice[0]=day&slice[1]=pid&filter[date_from]=${startDate}&filter[date_to]=${endDate}`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
@@ -42,22 +42,21 @@ export async function GET(request) {
     let totalConversions = 0;
     let totalPayout = 0;
 
+    // Response mein se sirf us specific Partner (subId) ki rows filter karke sum karenge
     statsList.forEach(row => {
-      const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
-      const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
-      const payout = Number(row?.payout || row?.revenue || 0);
+      // Affise row object ya row.slice ke andar pid deta hai
+      const rowPid = String(row?.pid || row?.slice?.pid || row?.affiliate || '');
+      
+      if (rowPid === String(subId)) {
+        const clicks = Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
+        const conversions = Number(row?.actions || row?.conversions || row?.approved || 0);
+        const payout = Number(row?.payout || row?.revenue || 0);
 
-      totalClicks += clicks;
-      totalConversions += conversions;
-      totalPayout += payout;
+        totalClicks += clicks;
+        totalConversions += conversions;
+        totalPayout += payout;
+      }
     });
-
-    // Fallback for partner 224 if API returns empty array due to permission scopes
-    if (totalClicks === 0 && String(subId) === '224') {
-      totalClicks = 212847;
-      totalConversions = 136;
-      totalPayout = 23.98;
-    }
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
     const cr = `${calculatedCr}%`;
