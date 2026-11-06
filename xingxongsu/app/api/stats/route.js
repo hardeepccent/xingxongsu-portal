@@ -2,19 +2,19 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const startDate = searchParams.get('from');
-  const endDate = searchParams.get('to');
+  const startDate = searchParams.get('startDate');
+  const endDate = searchParams.get('endDate');
 
-  // Affise Statistics API endpoint (apne hisab se URL check kar liyo)
-  const affiseUrl = `https://api.affise.com/3.0/admin/stats/custom?date_from=${startDate}&date_to=${endDate}&group[0]=offer_id`;
+  // Affise API URL with date range and grouping by offer_id
+  const affiseUrl = `https://api-affise.com/3.0/stats/custom?date_from=${startDate}&date_to=${endDate}&group[0]=offer_id`;
 
   try {
     const response = await fetch(affiseUrl, {
       headers: {
-        'API-Key': process.env.AFFISE_API_KEY, // Teri Affise API key .env mein honi chahiye
+        'API-Key': process.env.AFFISE_API_KEY,
       },
     });
-    
+
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
