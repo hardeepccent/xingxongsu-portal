@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/auth", "destination": "/api/auth/verify" },
     { "source": "/track", "destination": "/api/redirect" }
   ]
 }
