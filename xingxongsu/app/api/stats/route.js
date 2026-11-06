@@ -26,7 +26,7 @@ export async function GET(request) {
         filter: {
           date_from: startDate,
           date_to: endDate,
-          affiliate: Number(subId)
+          pid: Number(subId)
         }
       })
     });
@@ -36,7 +36,6 @@ export async function GET(request) {
     try {
       data = JSON.parse(textResponse);
     } catch (e) {
-      console.error("AFFISE NON-JSON RESPONSE:", textResponse);
       return NextResponse.json({ 
         success: false, 
         message: 'Affise returned non-JSON response', 
@@ -44,9 +43,6 @@ export async function GET(request) {
       }, { status: 500 });
     }
 
-    console.log("AFFISE RAW RESPONSE:", JSON.stringify(data, null, 2));
-
-    // Affise custom stats returns rows in data array
     const statsList = data?.data || [];
     
     let totalClicks = 0;
