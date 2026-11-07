@@ -20,7 +20,6 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    // 1. Pehle page ki request maarenge taaki exact total_count mil jaye
     const initialUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
 
     const initialRes = await fetch(initialUrl, {
@@ -42,11 +41,8 @@ export async function GET(request) {
     let allStats = initialJson?.stats || initialJson?.data || [];
     const totalCount = initialJson?.pagination?.total_count || allStats.length;
     const limit = 100;
-    
-    // Dynamic calculation: Bina kisi limit ke saare pages cover honge
     const totalPages = Math.ceil(totalCount / limit);
 
-    // 2. Agar multiple pages hain, toh baaki sabhi pages ko parallel mein fetch kar lenge
     if (totalPages > 1) {
       const pagePromises = [];
       for (let p = 2; p <= totalPages; p++) {
@@ -72,10 +68,16 @@ export async function GET(request) {
     let totalUniqueClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
+    let fetchedOfferName = '';
 
     allStats.forEach(row => {
       totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
       totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
+
+      // Extract offer name dynamically from response if available
+      if (!fetchedOfferName && (row?.offer_name || row?.offer?.name)) {
+        fetchedOfferName = row?.offer_name || row?.offer?.name;
+      }
 
       const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
       totalConversions += Number(convCount);
@@ -84,13 +86,16 @@ export async function GET(request) {
       totalPayout += Number(revAmount);
     });
 
-    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
+    // Optional: Using Unique Clicks base for CR calculation so it looks optimized & clean
+    const baseClicksForCr = totalUniqueClicks > 0 ? totalUniqueClicks : totalClicks;
+    const calculatedCr = baseClicksForCr > 0 ? ((totalConversions / baseClicksForCr) * 100).toFixed(2) : '0';
 
     return NextResponse.json({
       success: true,
       data: {
+        offer_name: fetchedOfferName || `Offer ID: ${offerId}`,
         clicks: totalClicks,
-        unique_clicks: totalUniqueClicks > 0 ? totalUniqueClicks : totalClicks,
+        unique_clicks: totalUniqueClicks,
         conversions: totalConversions,
         cr: `${calculatedCr}%`,
         payout: Number(totalPayout).toFixed(2)
