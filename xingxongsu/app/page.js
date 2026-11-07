@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Portal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -9,8 +9,17 @@ export default function Portal() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  // Default date range: Last 7 days up to today
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+  const getSevenDaysAgoDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  };
+
+  const [startDate, setStartDate] = useState(getSevenDaysAgoDate());
+  const [endDate, setEndDate] = useState(getTodayDate());
+  
   const [metrics, setMetrics] = useState({ clicks: 0, unique_clicks: 0, conversions: 0, cr: '0%', payout: 0 });
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +87,7 @@ export default function Portal() {
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required
-              style={{ width: '100%', background: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff', padding: '12px 14px', borderRadius: '8px', boxSizing: 'border-box', outline: 'none', transition: 'border 0.2s' }}
+              style={{ width: '100%', background: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff', padding: '12px 14px', borderRadius: '8px', boxSizing: 'border-box', outline: 'none' }}
             />
           </div>
 
@@ -89,11 +98,11 @@ export default function Portal() {
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               required
-              style={{ width: '100%', background: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff', padding: '12px 14px', borderRadius: '8px', boxSizing: 'border-box', outline: 'none', transition: 'border 0.2s' }}
+              style={{ width: '100%', background: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff', padding: '12px 14px', borderRadius: '8px', boxSizing: 'border-box', outline: 'none' }}
             />
           </div>
 
-          <button type="submit" style={{ width: '100%', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)', transition: 'transform 0.1s' }}>
+          <button type="submit" style={{ width: '100%', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)' }}>
             Secure Login
           </button>
         </form>
@@ -111,7 +120,7 @@ export default function Portal() {
         </div>
         <button 
           onClick={() => setIsLoggedIn(false)} 
-          style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '13px', transition: 'background 0.2s' }}
+          style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}
         >
           Sign Out
         </button>
@@ -132,7 +141,7 @@ export default function Portal() {
           </select>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>START DATE</label>
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>START DATE (7 Days Prior)</label>
           <input 
             type="date" 
             value={startDate} 
@@ -141,7 +150,7 @@ export default function Portal() {
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>END DATE</label>
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>END DATE (Today)</label>
           <input 
             type="date" 
             value={endDate} 
@@ -152,7 +161,7 @@ export default function Portal() {
         <button 
           onClick={fetchMetrics} 
           disabled={loading}
-          style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#fff', border: 'none', padding: '0 24px', height: '42px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)', transition: 'opacity 0.2s' }}
+          style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#fff', border: 'none', padding: '0 24px', height: '42px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)' }}
         >
           {loading ? 'Fetching...' : 'Fetch Metrics'}
         </button>
@@ -161,35 +170,30 @@ export default function Portal() {
       {/* Metrics Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '20px' }}>
         
-        {/* Total Clicks */}
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(96, 165, 250, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#60a5fa' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>TOTAL CLICKS</div>
           <div style={{ fontSize: '30px', fontWeight: '800', color: '#60a5fa', textShadow: '0 0 20px rgba(96, 165, 250, 0.3)' }}>{metrics.clicks}</div>
         </div>
 
-        {/* Unique Clicks */}
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(52, 211, 153, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#34d399' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>UNIQUE CLICKS</div>
           <div style={{ fontSize: '30px', fontWeight: '800', color: '#34d399', textShadow: '0 0 20px rgba(52, 211, 153, 0.3)' }}>{metrics.unique_clicks}</div>
         </div>
 
-        {/* Conversions */}
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(251, 191, 36, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#fbbf24' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>CONVERSIONS</div>
           <div style={{ fontSize: '30px', fontWeight: '800', color: '#fbbf24', textShadow: '0 0 20px rgba(251, 191, 36, 0.3)' }}>{metrics.conversions}</div>
         </div>
 
-        {/* Conversion Rate */}
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(248, 113, 113, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#f87171' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>CONVERSION RATE</div>
           <div style={{ fontSize: '30px', fontWeight: '800', color: '#f87171', textShadow: '0 0 20px rgba(248, 113, 113, 0.3)' }}>{metrics.cr}</div>
         </div>
 
-        {/* Payout */}
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(45, 212, 191, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#2dd4bf' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>TOTAL PAYOUT</div>
