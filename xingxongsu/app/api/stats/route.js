@@ -20,43 +20,58 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}`;
+    let allStats = [];
+    let currentPage = 1;
+    let hasMorePages = true;
 
-    const response = await fetch(affiseUrl, {
-      method: 'GET',
-      headers: {
-        'api-key': apiKey,
-        'Content-Type': 'application/json',
+    // Loop through pages to fetch all records if pagination exists
+    while (hasMorePages && currentPage <= 5) { // Safety limit of 5 pages max
+      const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=${currentPage}&limit=100`;
+
+      const response = await fetch(affiseUrl, {
+        method: 'GET',
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const textResponse = await response.text();
+      let jsonResponse;
+      try {
+        jsonResponse = JSON.parse(textResponse);
+      } catch (e) {
+        break;
       }
-    });
 
-    const textResponse = await response.text();
-    let jsonResponse;
-    try {
-      jsonResponse = JSON.parse(textResponse);
-    } catch (e) {
-      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: textResponse }, { status: 500 });
+      const statsList = jsonResponse?.stats || jsonResponse?.data || [];
+      if (Array.isArray(statsList) && statsList.length > 0) {
+        allStats = allStats.concat(statsList);
+      }
+
+      // Check if next page exists
+      if (jsonResponse?.pagination?.next_page) {
+        currentPage = jsonResponse.pagination.next_page;
+      } else {
+        hasMorePages = false;
+      }
     }
 
-    const statsList = jsonResponse?.stats || jsonResponse?.data || [];
-    
     let totalClicks = 0;
     let totalUniqueClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
-    if (Array.isArray(statsList)) {
-      statsList.forEach(row => {
-        totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
-        totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
+    allStats.forEach(row => {
+      totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
+      totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
-        const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
-        totalConversions += Number(convCount);
+      const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
+      totalConversions += Number(convCount);
 
-        const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
-        totalPayout += Number(revAmount);
-      });
-    }
+      const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
+      totalPayout += Number(revAmount);
+    });
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
 
