@@ -20,10 +20,10 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    // Using stats/get for accurate global/offer summary without breaking limits
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/get?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}`;
+    // 1. Pehle page ki request maarenge taaki total count aur pages ka pata chale
+    const initialUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
 
-    const response = await fetch(affiseUrl, {
+    const initialRes = await fetch(initialUrl, {
       method: 'GET',
       headers: {
         'api-key': apiKey,
@@ -31,33 +31,56 @@ export async function GET(request) {
       }
     });
 
-    const textResponse = await response.text();
-    let jsonResponse;
+    const initialText = await initialRes.text();
+    let initialJson;
     try {
-      jsonResponse = JSON.parse(textResponse);
+      initialJson = JSON.parse(initialText);
     } catch (e) {
-      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: textResponse }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: initialText }, { status: 500 });
     }
 
-    const statsList = jsonResponse?.stats || jsonResponse?.data || [];
-    
+    let allStats = initialJson?.stats || initialJson?.data || [];
+    const totalCount = initialJson?.pagination?.total_count || allStats.length;
+    const limit = 100;
+    const totalPages = Math.min(Math.ceil(totalCount / limit), 30); // Max 30 pages safety cap
+
+    // 2. Baaki pages ki requests ek sath (in parallel) daal denge taaki speed fast rahe
+    if (totalPages > 1) {
+      const pagePromises = [];
+      for (let p = 2; p <= totalPages; p++) {
+        const pageUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=${p}&limit=${limit}`;
+        pagePromises.push(
+          fetch(pageUrl, {
+            method: 'GET',
+            headers: { 'api-key': apiKey, 'Content-Type': 'application/json' }
+          }).then(res => res.json()).catch(() => null)
+        );
+      }
+
+      const results = await Promise.all(pagePromises);
+      results.forEach(jsonRes => {
+        const statsList = jsonRes?.stats || jsonRes?.data || [];
+        if (Array.isArray(statsList) && statsList.length > 0) {
+          allStats = allStats.concat(statsList);
+        }
+      });
+    }
+
     let totalClicks = 0;
     let totalUniqueClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
-    if (Array.isArray(statsList)) {
-      statsList.forEach(row => {
-        totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
-        totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
+    allStats.forEach(row => {
+      totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
+      totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
-        const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
-        totalConversions += Number(convCount);
+      const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
+      totalConversions += Number(convCount);
 
-        const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
-        totalPayout += Number(revAmount);
-      });
-    }
+      const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
+      totalPayout += Number(revAmount);
+    });
 
     const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
 
