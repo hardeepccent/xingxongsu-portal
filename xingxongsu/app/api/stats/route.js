@@ -20,8 +20,8 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    // Changing endpoint from getbysub to getDay for exact summary totals without sub1 breakdown caps
-    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getDay?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}`;
+    // Using stats/get for accurate global/offer summary without breaking limits
+    const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/get?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}`;
 
     const response = await fetch(affiseUrl, {
       method: 'GET',
