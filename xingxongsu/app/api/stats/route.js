@@ -20,15 +20,23 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    const initialUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
+    // 1. Parallel mein Stats aur Offer Details dono fetch kar lenge taaki Offer Name 100% mile
+    const statsUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
+    const offerUrl = `https://api-digimcorps.affise.com/3.0/offer/${offerId}`;
 
-    const initialRes = await fetch(initialUrl, {
-      method: 'GET',
-      headers: {
-        'api-key': apiKey,
-        'Content-Type': 'application/json',
-      }
-    });
+    const [initialRes, offerRes] = await Promise.all([
+      fetch(statsUrl, { method: 'GET', headers: { 'api-key': apiKey, 'Content-Type': 'application/json' } }),
+      fetch(offerUrl, { method: 'GET', headers: { 'api-key': apiKey, 'Content-Type': 'application/json' } }).catch(() => null)
+    ]);
+
+    // Extract Offer Name safely from offer endpoint response
+    let fetchedOfferName = '';
+    if (offerRes) {
+      try {
+        const offerJson = await offerRes.json();
+        fetchedOfferName = offerJson?.data?.title || offerJson?.offer?.title || offerJson?.data?.name || '';
+      } catch (e) {}
+    }
 
     const initialText = await initialRes.text();
     let initialJson;
@@ -43,6 +51,7 @@ export async function GET(request) {
     const limit = 100;
     const totalPages = Math.ceil(totalCount / limit);
 
+    // Un-capped pagination loop for remaining pages
     if (totalPages > 1) {
       const pagePromises = [];
       for (let p = 2; p <= totalPages; p++) {
@@ -64,19 +73,16 @@ export async function GET(request) {
       });
     }
 
-    let totalClicks = 0;
     let totalUniqueClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
-    let fetchedOfferName = '';
 
     allStats.forEach(row => {
-      totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
       totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
-      // Extract offer name dynamically from response if available
-      if (!fetchedOfferName && (row?.offer_name || row?.offer?.name)) {
-        fetchedOfferName = row?.offer_name || row?.offer?.name;
+      // Fallback check inside stats rows if offer endpoint missed it
+      if (!fetchedOfferName) {
+        fetchedOfferName = row?.offer_name || row?.offer?.name || row?.offer_title || '';
       }
 
       const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
@@ -86,15 +92,12 @@ export async function GET(request) {
       totalPayout += Number(revAmount);
     });
 
-    // Optional: Using Unique Clicks base for CR calculation so it looks optimized & clean
-    const baseClicksForCr = totalUniqueClicks > 0 ? totalUniqueClicks : totalClicks;
-    const calculatedCr = baseClicksForCr > 0 ? ((totalConversions / baseClicksForCr) * 100).toFixed(2) : '0';
+    const calculatedCr = totalUniqueClicks > 0 ? ((totalConversions / totalUniqueClicks) * 100).toFixed(2) : '0';
 
     return NextResponse.json({
       success: true,
       data: {
-        offer_name: fetchedOfferName || `Offer ID: ${offerId}`,
-        clicks: totalClicks,
+        offer_name: fetchedOfferName ? `${fetchedOfferName} (ID: ${offerId})` : `Offer ID: ${offerId}`,
         unique_clicks: totalUniqueClicks,
         conversions: totalConversions,
         cr: `${calculatedCr}%`,
