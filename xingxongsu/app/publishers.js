@@ -2,7 +2,7 @@ export const PUBLISHERS_DB = [
   { 
     email: 'test@publisher.com', 
     password: '123456', 
-    sub_id: '57', 
+    sub_id: '01', 
     apiKey: 'YAHAN_PUBLISHER_57_KI_API_KEY',
     offerIds: ['313910']
   },
@@ -12,5 +12,12 @@ export const PUBLISHERS_DB = [
     sub_id: '224', 
     apiKey: 'f659b021997bb8dce0eb2e0f30b67207',
     offerIds: ['1013055', '1012830', '1002834', '1010249']
+  },
+  { 
+    email: 'rajat.cent@gmail.com', 
+    password: 'password@57', 
+    sub_id: '57', 
+    apiKey: '7e31668e752a070f26994d9c67cd82ec',
+    offerIds: ['987764']
   }
 ];
