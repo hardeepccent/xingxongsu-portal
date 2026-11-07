@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PUBLISHERS_DB } from '@/publishers';
+import { PUBLISHERS_DB } from '../../publishers';
 
 export async function GET(request) {
   try {
