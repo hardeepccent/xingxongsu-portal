@@ -42,14 +42,22 @@ export async function GET(request) {
     const statsList = Array.isArray(rawData) ? rawData : (rawData?.rows || rawData?.list || []);
     
     let totalClicks = 0;
+    let totalUniqueClicks = 0;
     let totalConversions = 0;
     let totalPayout = 0;
 
     if (Array.isArray(statsList)) {
       statsList.forEach(row => {
-        totalClicks += Number(row?.clicks || row?.unique_clicks || row?.gross_clicks || 0);
-        totalConversions += Number(row?.actions?.confirmed || row?.actions?.total || row?.conversions || row?.approved || 0);
-        totalPayout += Number(row?.payout?.confirmed || row?.payout?.total || row?.payout || row?.revenue || 0);
+        totalClicks += Number(row?.clicks || row?.gross_clicks || row?.total_clicks || 0);
+        totalUniqueClicks += Number(row?.unique_clicks || row?.uniques || 0);
+
+        const actionObj = row?.actions || row?.conversions_data || {};
+        const confConv = Number(actionObj?.confirmed || actionObj?.approved || actionObj?.total || row?.conversions || row?.approved || 0);
+        totalConversions += confConv;
+
+        const payoutObj = row?.payout || row?.revenue_data || {};
+        const confPayout = Number(payoutObj?.confirmed || payoutObj?.approved || payoutObj?.total || row?.payout || row?.revenue || 0);
+        totalPayout += confPayout;
       });
     }
 
@@ -59,7 +67,7 @@ export async function GET(request) {
       success: true,
       data: {
         clicks: totalClicks,
-        unique_clicks: totalClicks,
+        unique_clicks: totalUniqueClicks > 0 ? totalUniqueClicks : totalClicks,
         conversions: totalConversions,
         cr: `${calculatedCr}%`,
         payout: Number(totalPayout).toFixed(2)
