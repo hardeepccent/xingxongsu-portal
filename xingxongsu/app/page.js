@@ -20,7 +20,7 @@ export default function Portal() {
   const [startDate, setStartDate] = useState(getSevenDaysAgoDate());
   const [endDate, setEndDate] = useState(getTodayDate());
   
-  const [metrics, setMetrics] = useState({ clicks: 0, unique_clicks: 0, conversions: 0, cr: '0%', payout: 0 });
+  const [metrics, setMetrics] = useState({ offer_name: '', unique_clicks: 0, conversions: 0, cr: '0%', payout: 0 });
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -167,15 +167,16 @@ export default function Portal() {
         </button>
       </div>
 
-      {/* Metrics Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '20px' }}>
-        
-        <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(96, 165, 250, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#60a5fa' }}></div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>TOTAL CLICKS</div>
-          <div style={{ fontSize: '30px', fontWeight: '800', color: '#60a5fa', textShadow: '0 0 20px rgba(96, 165, 250, 0.3)' }}>{metrics.clicks}</div>
+      {/* Dynamic Offer Name Header Display */}
+      {metrics.offer_name && (
+        <div style={{ marginBottom: '20px', fontSize: '15px', fontWeight: '600', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '12px 18px', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+          Active Offer: <span style={{ color: '#fff' }}>{metrics.offer_name}</span>
         </div>
+      )}
 
+      {/* Metrics Cards Grid (4 Cards Layout - Total Clicks Removed) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+        
         <div style={{ background: 'linear-gradient(145deg, rgba(17, 24, 39, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)', padding: '24px', borderRadius: '14px', border: '1px solid rgba(52, 211, 153, 0.2)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#34d399' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>UNIQUE CLICKS</div>
