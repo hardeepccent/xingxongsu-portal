@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PUBLISHERS_DB } from '@/app/api/auth/route';
+import { PUBLISHERS_DB } from '@/app/publishers';
 
 export async function GET(request) {
   try {
@@ -20,7 +20,6 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    // Affise Official Endpoint with specific offer filter
     const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}`;
 
     const response = await fetch(affiseUrl, {
