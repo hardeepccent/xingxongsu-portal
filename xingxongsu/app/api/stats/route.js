@@ -34,11 +34,10 @@ export async function GET(request) {
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(textResponse);
-    } catch (e) {
+    } conversions (e) {
       return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: textResponse }, { status: 500 });
     }
 
-    // Affise response structure ke mutabiq 'stats' array utha rahe hain
     const statsList = jsonResponse?.stats || jsonResponse?.data || [];
     
     let totalClicks = 0;
@@ -48,17 +47,16 @@ export async function GET(request) {
 
     if (Array.isArray(statsList)) {
       statsList.forEach(row => {
-        // Clicks parsing from 'traffic' object
         totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
         totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
-        // Conversions parsing from 'actions.confirmed.count' or 'actions.total.count'
-        const confirmedActions = row?.actions?.confirmed?.count || row?.actions?.total?.count || 0;
-        totalConversions += Number(confirmedActions);
+        // Conversions parsing: Approved Qty ya Confirmed actions ka count
+        const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
+        totalConversions += Number(convCount);
 
-        // Payout / Revenue parsing from 'actions.confirmed.revenue' or 'traffic.revenue'
-        const confirmedRevenue = row?.actions?.confirmed?.revenue || row?.actions?.total?.revenue || row?.traffic?.revenue || 0;
-        totalPayout += Number(confirmedRevenue);
+        // Payout parsing: Approved Revenue ya Confirmed/Total revenue
+        const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
+        totalPayout += Number(revAmount);
       });
     }
 
