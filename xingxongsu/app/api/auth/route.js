@@ -13,7 +13,7 @@ const PUBLISHERS_DB = [
     password: 'password123', 
     sub_id: '224', 
     apiKey: 'f659b021997bb8dce0eb2e0f30b67207',
-    offerIds: ['313910', '309108'] // Iski jitni bhi active offer IDs hain
+    offerIds: ['1013055', '1012830', '1002834', '1010249'] // Iski jitni bhi active offer IDs hain
   }
 ];
 
