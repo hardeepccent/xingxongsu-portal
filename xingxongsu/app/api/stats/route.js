@@ -75,6 +75,8 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
-  }
-}
+ // Temporary check karne ke liye ki Affise kya bhej raha hai
+    return NextResponse.json({
+      success: true,
+      raw_affise_response: jsonResponse
+    });
