@@ -20,40 +20,50 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    let allStats = [];
-    let currentPage = 1;
-    let hasMorePages = true;
+    // 1. Pehle page ki request maarenge yeh dekhne ke liye ki total kitne pages hain
+    const initialUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
 
-    // Fetching up to 50 pages (5000 rows max) to cover all sub1 breakouts
-    while (hasMorePages && currentPage <= 50) {
-      const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=${currentPage}&limit=100`;
+    const initialRes = await fetch(initialUrl, {
+      method: 'GET',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+      }
+    });
 
-      const response = await fetch(affiseUrl, {
-        method: 'GET',
-        headers: {
-          'api-key': apiKey,
-          'Content-Type': 'application/json',
+    const initialText = await initialRes.text();
+    let initialJson;
+    try {
+      initialJson = JSON.parse(initialText);
+    } catch (e) {
+      return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: initialText }, { status: 500 });
+    }
+
+    let allStats = initialJson?.stats || initialJson?.data || [];
+    const totalCount = initialJson?.pagination?.total_count || allStats.length;
+    const limit = 100;
+    const totalPages = Math.min(Math.ceil(totalCount / limit), 20); // Max 20 pages safety cap
+
+    // 2. Agar multiple pages hain, toh baaki sabhi pages ki requests ek sath (in parallel) daal denge taaki speed 10x ho jaye
+    if (totalPages > 1) {
+      const pagePromises = [];
+      for (let p = 2; p <= totalPages; p++) {
+        const pageUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=${p}&limit=${limit}`;
+        pagePromises.push(
+          fetch(pageUrl, {
+            method: 'GET',
+            headers: { 'api-key': apiKey, 'Content-Type': 'application/json' }
+          }).then(res => res.json()).catch(() => null)
+        );
+      }
+
+      const results = await Promise.all(pagePromises);
+      results.forEach(jsonRes => {
+        const statsList = jsonRes?.stats || jsonRes?.data || [];
+        if (Array.isArray(statsList) && statsList.length > 0) {
+          allStats = allStats.concat(statsList);
         }
       });
-
-      const textResponse = await response.text();
-      let jsonResponse;
-      try {
-        jsonResponse = JSON.parse(textResponse);
-      } catch (e) {
-        break;
-      }
-
-      const statsList = jsonResponse?.stats || jsonResponse?.data || [];
-      if (Array.isArray(statsList) && statsList.length > 0) {
-        allStats = allStats.concat(statsList);
-      }
-
-      if (jsonResponse?.pagination?.next_page) {
-        currentPage = jsonResponse.pagination.next_page;
-      } else {
-        hasMorePages = false;
-      }
     }
 
     let totalClicks = 0;
@@ -65,6 +75,7 @@ export async function GET(request) {
       totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
       totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
+      // Approved / Confirmed conversions mapping matching Affise panel
       const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
       totalConversions += Number(convCount);
 
