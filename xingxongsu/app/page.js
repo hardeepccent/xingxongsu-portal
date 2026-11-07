@@ -9,7 +9,7 @@ export default function Portal() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  // Default date range: Last 7 days up to today
+  // Default date range: Both set to Today, but Start Date can go back up to 7 days
   const getTodayDate = () => new Date().toISOString().split('T')[0];
   const getSevenDaysAgoDate = () => {
     const d = new Date();
@@ -17,7 +17,7 @@ export default function Portal() {
     return d.toISOString().split('T')[0];
   };
 
-  const [startDate, setStartDate] = useState(getSevenDaysAgoDate());
+  const [startDate, setStartDate] = useState(getTodayDate());
   const [endDate, setEndDate] = useState(getTodayDate());
   
   const [metrics, setMetrics] = useState({ offer_name: '', unique_clicks: 0, conversions: 0, cr: '0%', payout: 0 });
@@ -141,12 +141,14 @@ export default function Portal() {
           </select>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>START DATE (7 Days Prior)</label>
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.5px' }}>START DATE (Last 7 Days)</label>
           <input 
             type="date" 
             value={startDate} 
+            min={getSevenDaysAgoDate()}
+            max={getTodayDate()}
             onChange={(e) => setStartDate(e.target.value)}
-            style={{ background: '#030712', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', padding: '10px 14px', borderRadius: '8px', height: '42px', outline: 'none', boxSizing: 'border-box' }}
+            style={{ background: '#030712', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', padding: '10px 14px', borderRadius: '8px', height: '42px', outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }}
           />
         </div>
         <div>
@@ -154,8 +156,9 @@ export default function Portal() {
           <input 
             type="date" 
             value={endDate} 
+            max={getTodayDate()}
             onChange={(e) => setEndDate(e.target.value)}
-            style={{ background: '#030712', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', padding: '10px 14px', borderRadius: '8px', height: '42px', outline: 'none', boxSizing: 'border-box' }}
+            style={{ background: '#030712', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#fff', padding: '10px 14px', borderRadius: '8px', height: '42px', outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }}
           />
         </div>
         <button 
