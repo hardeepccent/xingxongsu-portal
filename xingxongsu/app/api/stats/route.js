@@ -20,7 +20,7 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: `API key not found for sub_id: ${subId}` }, { status: 401 });
     }
 
-    // 1. Pehle page ki request maarenge taaki total count aur pages ka pata chale
+    // 1. Pehle page ki request maarenge taaki exact total_count mil jaye
     const initialUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=1&limit=100`;
 
     const initialRes = await fetch(initialUrl, {
@@ -42,9 +42,11 @@ export async function GET(request) {
     let allStats = initialJson?.stats || initialJson?.data || [];
     const totalCount = initialJson?.pagination?.total_count || allStats.length;
     const limit = 100;
-    const totalPages = Math.min(Math.ceil(totalCount / limit), 30); // Max 30 pages safety cap
+    
+    // Dynamic calculation: Bina kisi limit ke saare pages cover honge
+    const totalPages = Math.ceil(totalCount / limit);
 
-    // 2. Baaki pages ki requests ek sath (in parallel) daal denge taaki speed fast rahe
+    // 2. Agar multiple pages hain, toh baaki sabhi pages ko parallel mein fetch kar lenge
     if (totalPages > 1) {
       const pagePromises = [];
       for (let p = 2; p <= totalPages; p++) {
