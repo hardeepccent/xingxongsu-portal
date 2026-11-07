@@ -34,7 +34,7 @@ export async function GET(request) {
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(textResponse);
-    } conversions (e) {
+    } catch (e) {
       return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: textResponse }, { status: 500 });
     }
 
@@ -50,11 +50,9 @@ export async function GET(request) {
         totalClicks += Number(row?.traffic?.raw || row?.clicks || 0);
         totalUniqueClicks += Number(row?.traffic?.uniq || row?.unique_clicks || 0);
 
-        // Conversions parsing: Approved Qty ya Confirmed actions ka count
         const convCount = row?.approved?.qty ?? row?.actions?.confirmed?.count ?? row?.actions?.total?.count ?? row?.conversions ?? 0;
         totalConversions += Number(convCount);
 
-        // Payout parsing: Approved Revenue ya Confirmed/Total revenue
         const revAmount = row?.approved?.revenue ?? row?.actions?.confirmed?.revenue ?? row?.actions?.total?.revenue ?? row?.traffic?.revenue ?? 0;
         totalPayout += Number(revAmount);
       });
