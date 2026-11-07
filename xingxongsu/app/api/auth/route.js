@@ -1,21 +1,5 @@
 import { NextResponse } from 'next/server';
-
-const PUBLISHERS_DB = [
-  { 
-    email: 'test@publisher.com', 
-    password: '123456', 
-    sub_id: '57', 
-    apiKey: 'YAHAN_PUBLISHER_57_KI_API_KEY',
-    offerIds: ['313910'] // Yahan is publisher ki offer IDs daal dena
-  },
-  { 
-    email: 'aarushi@mobpine.com', 
-    password: 'password123', 
-    sub_id: '224', 
-    apiKey: 'f659b021997bb8dce0eb2e0f30b67207',
-    offerIds: ['1013055', '1012830', '1002834', '1010249'] // Iski jitni bhi active offer IDs hain
-  }
-];
+import { PUBLISHERS_DB } from '@/app/publishers';
 
 export async function POST(request) {
   try {
@@ -29,7 +13,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         sub_id: publisher.sub_id,
-        offerIds: publisher.offerIds, // Yeh frontend dropdown ke liye bhej rahe hain
+        offerIds: publisher.offerIds,
         message: 'Login successful'
       });
     } else {
