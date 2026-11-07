@@ -38,45 +38,12 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Non-JSON response from Affise', raw: textResponse }, { status: 500 });
     }
 
-    const rawData = jsonResponse?.data || jsonResponse;
-    const statsList = Array.isArray(rawData) ? rawData : (rawData?.rows || rawData?.list || []);
-    
-    let totalClicks = 0;
-    let totalUniqueClicks = 0;
-    let totalConversions = 0;
-    let totalPayout = 0;
-
-    if (Array.isArray(statsList)) {
-      statsList.forEach(row => {
-        totalClicks += Number(row?.clicks || row?.gross_clicks || row?.total_clicks || 0);
-        totalUniqueClicks += Number(row?.unique_clicks || row?.uniques || 0);
-
-        const actionObj = row?.actions || row?.conversions_data || {};
-        const confConv = Number(actionObj?.confirmed || actionObj?.approved || actionObj?.total || row?.conversions || row?.approved || 0);
-        totalConversions += confConv;
-
-        const payoutObj = row?.payout || row?.revenue_data || {};
-        const confPayout = Number(payoutObj?.confirmed || payoutObj?.approved || payoutObj?.total || row?.payout || row?.revenue || 0);
-        totalPayout += confPayout;
-      });
-    }
-
-    const calculatedCr = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        clicks: totalClicks,
-        unique_clicks: totalUniqueClicks > 0 ? totalUniqueClicks : totalClicks,
-        conversions: totalConversions,
-        cr: `${calculatedCr}%`,
-        payout: Number(totalPayout).toFixed(2)
-      }
-    });
-
-  } catch (error) {
- // Temporary check karne ke liye ki Affise kya bhej raha hai
     return NextResponse.json({
       success: true,
       raw_affise_response: jsonResponse
     });
+
+  } catch (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+  }
+}
