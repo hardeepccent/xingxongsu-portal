@@ -24,8 +24,8 @@ export async function GET(request) {
     let currentPage = 1;
     let hasMorePages = true;
 
-    // Loop through pages to fetch all records if pagination exists
-    while (hasMorePages && currentPage <= 5) { // Safety limit of 5 pages max
+    // Fetching up to 50 pages (5000 rows max) to cover all sub1 breakouts
+    while (hasMorePages && currentPage <= 50) {
       const affiseUrl = `https://api-digimcorps.affise.com/3.0/stats/getbysub?filter[date_from]=${startDate}&filter[date_to]=${endDate}&filter[offer]=${offerId}&page=${currentPage}&limit=100`;
 
       const response = await fetch(affiseUrl, {
@@ -49,7 +49,6 @@ export async function GET(request) {
         allStats = allStats.concat(statsList);
       }
 
-      // Check if next page exists
       if (jsonResponse?.pagination?.next_page) {
         currentPage = jsonResponse.pagination.next_page;
       } else {
