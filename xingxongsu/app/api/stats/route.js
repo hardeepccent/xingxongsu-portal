@@ -92,16 +92,26 @@ export async function GET(request) {
       totalPayout += Number(revAmount);
     });
 
-    const calculatedCr = totalUniqueClicks > 0 ? ((totalConversions / totalUniqueClicks) * 100).toFixed(2) : '0';
+    // 2. Publisher ki click range uthao (agar defined nahi hai toh default [1.0, 1.0] rakho)
+    const [minMultiplier, maxMultiplier] = publisher?.click_range || [1.0, 1.0];
+    
+    // 3. Range ke beech ka ek random multiplier generate karo taaki har fetch par natural fluctuation aaye
+    const randomMultiplier = minMultiplier + Math.random() * (maxMultiplier - minMultiplier);
+
+    // 4. Unique clicks par multiplier apply karke adjusted clicks nikalo
+    const adjustedUniqueClicks = Math.max(0, Math.round(totalUniqueClicks * randomMultiplier));
+
+    // 5. Adjusted clicks ke basis par CR calculate karo (clicks kam hone se CR automatically double/boost ho jayegi)
+    const calculatedCr = adjustedUniqueClicks > 0 ? ((totalConversions / adjustedUniqueClicks) * 100).toFixed(2) : '0';
 
     return NextResponse.json({
       success: true,
       data: {
         offer_name: fetchedOfferName ? `${fetchedOfferName} (ID: ${offerId})` : `Offer ID: ${offerId}`,
-        unique_clicks: totalUniqueClicks,
-        conversions: totalConversions,
-        cr: `${calculatedCr}%`,
-        payout: Number(totalPayout).toFixed(2)
+        unique_clicks: adjustedUniqueClicks, // Shaved/Randomized clicks
+        conversions: totalConversions,       // Real conversions safe rahenge
+        cr: `${calculatedCr}%`,              // Boosted CR
+        payout: Number(totalPayout).toFixed(2) // Real payout safe rahega
       }
     });
 
