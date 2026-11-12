@@ -95,23 +95,30 @@ export async function GET(request) {
     // 2. Publisher ki click range uthao (agar defined nahi hai toh default [1.0, 1.0] rakho)
     const [minMultiplier, maxMultiplier] = publisher?.click_range || [1.0, 1.0];
     
-    // 3. Range ke beech ka ek random multiplier generate karo taaki har fetch par natural fluctuation aaye
-    const randomMultiplier = minMultiplier + Math.random() * (maxMultiplier - minMultiplier);
+    // 3. Stable Hash Logic: Sub ID, Offer ID aur Date range se consistent pseudo-random value generate karo
+    const seedString = `${subId}_${offerId}_${startDate}_${endDate}`;
+    let hash = 0;
+    for (let i = 0; i < seedString.length; i++) {
+      hash = seedString.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const pseudoRandom = (Math.abs(hash) % 1000) / 1000; // 0 aur 1 ke beech stable value
 
-    // 4. Unique clicks par multiplier apply karke adjusted clicks nikalo
-    const adjustedUniqueClicks = Math.max(0, Math.round(totalUniqueClicks * randomMultiplier));
+    const stableMultiplier = minMultiplier + pseudoRandom * (maxMultiplier - minMultiplier);
 
-    // 5. Adjusted clicks ke basis par CR calculate karo (clicks kam hone se CR automatically double/boost ho jayegi)
+    // 4. Unique clicks par stable multiplier apply karke adjusted clicks nikalo
+    const adjustedUniqueClicks = Math.max(0, Math.round(totalUniqueClicks * stableMultiplier));
+
+    // 5. Adjusted clicks ke basis पर CR calculate karo
     const calculatedCr = adjustedUniqueClicks > 0 ? ((totalConversions / adjustedUniqueClicks) * 100).toFixed(2) : '0';
 
     return NextResponse.json({
       success: true,
       data: {
         offer_name: fetchedOfferName ? `${fetchedOfferName} (ID: ${offerId})` : `Offer ID: ${offerId}`,
-        unique_clicks: adjustedUniqueClicks, // Shaved/Randomized clicks
-        conversions: totalConversions,       // Real conversions safe rahenge
+        unique_clicks: adjustedUniqueClicks, // Stable & Shaved clicks
+        conversions: totalConversions,       // Real conversions safe
         cr: `${calculatedCr}%`,              // Boosted CR
-        payout: Number(totalPayout).toFixed(2) // Real payout safe rahega
+        payout: Number(totalPayout).toFixed(2) // Real payout safe
       }
     });
 
