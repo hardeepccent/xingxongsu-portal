@@ -6,7 +6,7 @@ export const PUBLISHERS_DB = [
     sub_id: '01', 
     apiKey: 'YAHAN_PUBLISHER_57_KI_API_KEY',
     offerIds: ['313910'],
-    click_multiplier: 1.0 // Actual clicks (no change)
+    click_range: [1.0, 1.0] // Actual clicks (no change)
   },
   { 
     email: 'aarushi@mobpine.com', 
@@ -15,7 +15,7 @@ export const PUBLISHERS_DB = [
     sub_id: '224', 
     apiKey: 'f659b021997bb8dce0eb2e0f30b67207',
     offerIds: ['1013055', '1012830', '1002834', '1010249'],
-    click_multiplier: 0.5 // Clicks 50% kam, CR double ho jayegi
+    click_range: [0.4, 0.6] // Clicks 40% se 60% ke beech random rahenge (CR double ke aas-paas fluctuate karegi)
   },
   { 
     email: 'rajat.cent@gmail.com', 
@@ -24,6 +24,6 @@ export const PUBLISHERS_DB = [
     sub_id: '57', 
     apiKey: '7e31668e752a070f26994d9c67cd82ec',
     offerIds: ['987764'],
-    click_multiplier: 1.0 // Actual clicks
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
