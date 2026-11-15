@@ -25,5 +25,14 @@ export const PUBLISHERS_DB = [
     apiKey: '7e31668e752a070f26994d9c67cd82ec',
     offerIds: ['987764'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'fruitbrothers007@gmail.com', 
+    phone: '9988776655',
+    password: 'password@57', 
+    sub_id: '89', 
+    apiKey: '0d5d1b7e0be6812cd7eda03594a19755',
+    offerIds: ['1018888'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
