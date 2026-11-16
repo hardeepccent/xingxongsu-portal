@@ -28,7 +28,7 @@ export const PUBLISHERS_DB = [
   },
   { 
     email: 'fruitbrothers007@gmail.com', 
-    phone: '9988776655',
+    phone: '9988776611',
     password: 'password@57', 
     sub_id: '89', 
     apiKey: '0d5d1b7e0be6812cd7eda03594a19755',
@@ -37,10 +37,19 @@ export const PUBLISHERS_DB = [
   },
   { 
     email: 'sachin@digimcorp.com', 
-    phone: '9988776655',
+    phone: '9988776677',
     password: 'password@123', 
     sub_id: '1', 
     apiKey: 'b9a2e150078b6c60d4fb2ce8cc749c64',
+    offerIds: ['1018902'],
+    click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'bhatiji7099@gmail.com', 
+    phone: '9988776666',
+    password: 'bhatiji7099@123', 
+    sub_id: '668', 
+    apiKey: '2a0c953d026b7b98bc045b1f05e159f2',
     offerIds: ['1018902'],
     click_range: [1.0, 1.0] // Actual clicks
   }
