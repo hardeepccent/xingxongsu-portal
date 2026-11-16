@@ -34,5 +34,14 @@ export const PUBLISHERS_DB = [
     apiKey: '0d5d1b7e0be6812cd7eda03594a19755',
     offerIds: ['1018888','1018891'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'sachin@digimcorp.com', 
+    phone: '9988776655',
+    password: 'password@123', 
+    sub_id: '1', 
+    apiKey: 'b9a2e150078b6c60d4fb2ce8cc749c64',
+    offerIds: ['1018902'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
