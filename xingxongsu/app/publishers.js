@@ -61,5 +61,14 @@ export const PUBLISHERS_DB = [
     apiKey: 'f03618dea79c40f0743156ebadeab921',
     offerIds: ['1018902'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'skytricks00@gmail.com', 
+    phone: '9988776666',
+    password: 'skytricks00@123', 
+    sub_id: '211', 
+    apiKey: 'f03618dea79c40f0743156ebadeab921',
+    offerIds: ['1018902'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
