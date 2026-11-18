@@ -124,5 +124,14 @@ export const PUBLISHERS_DB = [
     apiKey: '3ede8e1ee3c10e690188b12f4b857045',
     offerIds: ['1019001'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'arifbhaichannal@gmail.com', 
+    phone: '9988707222',
+    password: 'arifbhaichannal@123', 
+    sub_id: '271', 
+    apiKey: 'ab99fc89bc6f9e1580e9fe52ecfc0bad',
+    offerIds: ['1019001'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
