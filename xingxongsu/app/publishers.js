@@ -95,7 +95,7 @@ export const PUBLISHERS_DB = [
     password: 'arifkhanofficial777@123', 
     sub_id: '388', 
     apiKey: '990c39a24699ba5eec047a3bfcd9b268',
-    offerIds: ['1018902'],
+    offerIds: ['1019001'],
     click_range: [1.0, 1.0] // Actual clicks
   }
 ];
