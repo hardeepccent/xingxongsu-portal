@@ -138,8 +138,8 @@ export const PUBLISHERS_DB = [
     email: 'katariafitness789@gmail.com', 
     phone: '9988707222',
     password: 'katariafitness789@123', 
-    sub_id: '271', 
-    apiKey: 'ab99fc89bc6f9e1580e9fe52ecfc0bad',
+    sub_id: '244', 
+    apiKey: '69921e14ff314e7f521ee3d35e423a6c',
     offerIds: ['1019001'],
     click_range: [1.0, 1.0] // Actual clicks
   }
