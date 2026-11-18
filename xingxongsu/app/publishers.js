@@ -133,5 +133,14 @@ export const PUBLISHERS_DB = [
     apiKey: 'ab99fc89bc6f9e1580e9fe52ecfc0bad',
     offerIds: ['1019001'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'katariafitness789@gmail.com', 
+    phone: '9988707222',
+    password: 'katariafitness789@123', 
+    sub_id: '271', 
+    apiKey: 'ab99fc89bc6f9e1580e9fe52ecfc0bad',
+    offerIds: ['1019001'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
