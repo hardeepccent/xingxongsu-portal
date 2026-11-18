@@ -88,5 +88,14 @@ export const PUBLISHERS_DB = [
     apiKey: '65568895665e90920734879f49a7cd36',
     offerIds: ['1018902'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'arifkhanofficial777@gmail.com', 
+    phone: '998877222',
+    password: 'arifkhanofficial777@123', 
+    sub_id: '388', 
+    apiKey: '990c39a24699ba5eec047a3bfcd9b268',
+    offerIds: ['1018902'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
