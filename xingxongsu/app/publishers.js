@@ -106,5 +106,14 @@ export const PUBLISHERS_DB = [
     apiKey: '5da7dfa378c655b35b4b6f9702fff4e9',
     offerIds: ['1018902'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'akashhxpro@gmail.com', 
+    phone: '9988767222',
+    password: 'akashhxpro@123', 
+    sub_id: '750', 
+    apiKey: 'cab96507796f4d06f5e8d1448392919c',
+    offerIds: ['1019001'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
