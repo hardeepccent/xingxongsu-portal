@@ -77,7 +77,7 @@ export const PUBLISHERS_DB = [
     password: 'theshexuu@123', 
     sub_id: '211', 
     apiKey: 'd68636355e0eeb9b9a7b43225198d511',
-    offerIds: ['1018902'],
+    offerIds: ['1018902','1019001'],
     click_range: [1.0, 1.0] // Actual clicks
   },
   { 
