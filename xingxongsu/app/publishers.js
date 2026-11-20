@@ -160,5 +160,14 @@ export const PUBLISHERS_DB = [
     apiKey: '2a0c953d026b7b98bc045b1f05e159f2',
     offerIds: ['1019094'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'shanubhai364@gmail.com', 
+    phone: '9988607221',
+    password: 'shanubhai364@123', 
+    sub_id: '259', 
+    apiKey: 'd34a8c449fdb3cc2c28f250a6733a751',
+    offerIds: ['1019095'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
