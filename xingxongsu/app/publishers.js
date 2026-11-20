@@ -151,5 +151,14 @@ export const PUBLISHERS_DB = [
     apiKey: '0bd816b30ec774346816e8636c9f3deb',
     offerIds: ['1019001','1019083'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'bhatiji709@gmail.com', 
+    phone: '9988607222',
+    password: 'bhatiji709@123', 
+    sub_id: '668', 
+    apiKey: '2a0c953d026b7b98bc045b1f05e159f2',
+    offerIds: ['1019094'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
