@@ -132,7 +132,7 @@ export const PUBLISHERS_DB = [
     sub_id: '271', 
     apiKey: 'ab99fc89bc6f9e1580e9fe52ecfc0bad',
     offerIds: ['1019001'],
-    click_range: [1.0, 1.0] // Actual clicks
+    click_range: [0.6, 0.7] // Actual clicks
   },
   { 
     email: 'katariafitness789@gmail.com', 
