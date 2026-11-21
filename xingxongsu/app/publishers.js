@@ -149,7 +149,7 @@ export const PUBLISHERS_DB = [
     password: 'jasbirsingh0001@123', 
     sub_id: '751', 
     apiKey: '0bd816b30ec774346816e8636c9f3deb',
-    offerIds: ['1019001','1019083'],
+    offerIds: ['1019001','1019083','1019139'],
     click_range: [1.0, 1.0] // Actual clicks
   },
   { 
