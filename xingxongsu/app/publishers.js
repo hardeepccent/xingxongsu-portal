@@ -176,7 +176,7 @@ export const PUBLISHERS_DB = [
     password: 'expertearningonline@123', 
     sub_id: '703', 
     apiKey: '400c273cf338e5375c3e864d560d8b3f',
-    offerIds: ['1019136'],
+    offerIds: ['1019136','1019137'],
     click_range: [1.0, 1.0] // Actual clicks
   }
 ];
