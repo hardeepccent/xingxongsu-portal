@@ -169,5 +169,14 @@ export const PUBLISHERS_DB = [
     apiKey: 'd34a8c449fdb3cc2c28f250a6733a751',
     offerIds: ['1019095'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'expertearningonline@gmail.com', 
+    phone: '9988607221',
+    password: 'expertearningonline@123', 
+    sub_id: '703', 
+    apiKey: '400c273cf338e5375c3e864d560d8b3f',
+    offerIds: ['1019136'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
