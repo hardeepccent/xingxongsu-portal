@@ -274,7 +274,7 @@ export const PUBLISHERS_DB = [
     phone: '9988607220',
     password: 'ic9314039@123', 
     sub_id: '762', 
-    apiKey: 'b87feae6e9267becd36cbfab4a026e81',
+    apiKey: 'b13ae0be93991d6c9273ce50550bb206',
     offerIds: ['1019159'],
     click_range: [1.0, 1.0] // Actual clicks
   }
