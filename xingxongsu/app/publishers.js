@@ -313,5 +313,14 @@ export const PUBLISHERS_DB = [
     apiKey: '6530b3a8c96a5e6079ec48acddd1a74a',
     offerIds: ['1019180'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'promoapk15@gmail.com', 
+    phone: '9988607220',
+    password: 'promoapk15@123', 
+    sub_id: '767', 
+    apiKey: 'd6f0fd9bd8edd8c7b8ef7de5b21fc340',
+    offerIds: ['1019180'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
