@@ -331,5 +331,14 @@ export const PUBLISHERS_DB = [
     apiKey: '65568895665e90920734879f49a7cd36',
     offerIds: ['1019182'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'theshexuu@gmail.com', 
+    phone: '9988607220',
+    password: 'theshexuu@123', 
+    sub_id: '748', 
+    apiKey: 'd68636355e0eeb9b9a7b43225198d511',
+    offerIds: ['1019183'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
