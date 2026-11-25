@@ -140,7 +140,7 @@ export const PUBLISHERS_DB = [
     password: 'katariafitness789@123', 
     sub_id: '244', 
     apiKey: '69921e14ff314e7f521ee3d35e423a6c',
-    offerIds: ['1019001'],
+    offerIds: ['1019001','1019228'],
     click_range: [1.0, 1.0] // Actual clicks
   },
   { 
