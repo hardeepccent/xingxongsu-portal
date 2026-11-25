@@ -394,5 +394,14 @@ export const PUBLISHERS_DB = [
     apiKey: '5f5f46ce8a668707f6413360c6260473',
     offerIds: ['1019192'],
     click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'hinditechunboxing@gmail.com', 
+    phone: '9988607223',
+    password: 'promoapk20@123', 
+    sub_id: '443', 
+    apiKey: '5c9cbec6b4300303440321e19e5a341f',
+    offerIds: ['1019192'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
