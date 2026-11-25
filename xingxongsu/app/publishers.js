@@ -398,7 +398,7 @@ export const PUBLISHERS_DB = [
   { 
     email: 'hinditechunboxing@gmail.com', 
     phone: '9988607223',
-    password: 'promoapk20@123', 
+    password: 'hinditechunboxing@123', 
     sub_id: '443', 
     apiKey: '5c9cbec6b4300303440321e19e5a341f',
     offerIds: ['1019192'],
