@@ -338,7 +338,7 @@ export const PUBLISHERS_DB = [
     password: 'shanubhai364@123', 
     sub_id: '259', 
     apiKey: 'd34a8c449fdb3cc2c28f250a6733a751',
-    offerIds: ['1019184','1019095'],
+    offerIds: ['1019184','1019095','1019223'],
     click_range: [1.0, 1.0] // Actual clicks
   },
   { 
