@@ -461,10 +461,19 @@ export const PUBLISHERS_DB = [
   { 
     email: 'promoapk26@gmail.com', 
     phone: '9988607223',
-    password: 'ravirajkumar9693925527@123', 
+    password: 'promoapk26@123', 
     sub_id: '778', 
     apiKey: '98cb18975a8a5caa4fb9bc2126f28564',
     offerIds: ['1019346'],
+    click_range: [1.0, 1.0] // Actual clicks
+  },
+  { 
+    email: 'promoapk27@gmail.com', 
+    phone: '9988607223',
+    password: 'promoapk27@123', 
+    sub_id: '779', 
+    apiKey: '322bd5f5e3fd6c8f04164dcc86ddfa25',
+    offerIds: ['1019347'],
     click_range: [1.0, 1.0] // Actual clicks
   }
 ];
