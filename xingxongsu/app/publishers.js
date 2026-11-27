@@ -448,7 +448,7 @@ export const PUBLISHERS_DB = [
     apiKey: '0c71ebb4c35ce1c4e7539b4a293c9aa1',
     offerIds: ['1019308'],
     click_range: [1.0, 1.0] // Actual clicks
-  ,
+  },
   { 
     email: 'ravirajkumar9693925527@gmail.com', 
     phone: '9988607223',
