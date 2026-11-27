@@ -448,5 +448,14 @@ export const PUBLISHERS_DB = [
     apiKey: '0c71ebb4c35ce1c4e7539b4a293c9aa1',
     offerIds: ['1019308'],
     click_range: [1.0, 1.0] // Actual clicks
+  ,
+  { 
+    email: 'ravirajkumar9693925527@gmail.com', 
+    phone: '9988607223',
+    password: 'ravirajkumar9693925527@123', 
+    sub_id: '540', 
+    apiKey: '51b9656ea8051176df3bb530a7d4d091',
+    offerIds: ['1019344'],
+    click_range: [1.0, 1.0] // Actual clicks
   }
 ];
