@@ -499,7 +499,7 @@ export const PUBLISHERS_DB = [
     phone: '9988607223',
     password: 'promoapk30@123', 
     sub_id: '782', 
-    apiKey: '7017ed0aa63d3af70494d10af6130118',
+    apiKey: 'd1faec9d8fa3ef33e28639a53905e14a',
     offerIds: ['1019350'],
     click_range: [1.0, 1.0] // Actual clicks
   }
