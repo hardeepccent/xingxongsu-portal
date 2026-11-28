@@ -285,7 +285,7 @@ export const PUBLISHERS_DB = [
     sub_id: '764', 
     apiKey: 'aa2642fa419abdf1284b84ce7dc28b60',
     offerIds: ['1019178'],
-    click_range: [1.0, 1.0] // Actual clicks
+    click_range: [0.6, 0.7] // Actual clicks
   },
   { 
     email: 'promoapk13@gmail.com', 
